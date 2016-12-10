@@ -1,0 +1,9 @@
+Brought in a more recent bazel (4.2.0)
+
+Need to push that to nix pkgs.
+
+Had to patch the java to let me override the bazel shell in non-bsd or windows env.
+
+Had to patch-elf the rust version that comes down the pipe. If you see "rustc: No such file or directory" even though the executable is there, thats because you didn't patchelf.
+
+No idea how to fix this "scalably". Maybe someone else has already solved the problem somewhere else.
