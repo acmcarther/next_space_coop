@@ -9,12 +9,9 @@ load(
     "rust_doc_test",
 )
 
-rust_binary(
-    name = "server",
+rust_library(
+    name = "common",
     srcs = [
-        "main.rs",
+        "lib.rs",
     ],
-    deps = [
-      "//common",
-    ]
 )

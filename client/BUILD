@@ -14,4 +14,7 @@ rust_binary(
     srcs = [
         "main.rs",
     ],
+    deps = [
+      "//common",
+    ]
 )
