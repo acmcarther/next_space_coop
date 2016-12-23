@@ -1,0 +1,10 @@
+[package]
+name = "next_space_coop"
+version = "0.1.0"
+authors = ["Alex McArther <acmcarther@gmail.com>"]
+
+[dependencies]
+clap = "2.10.0"
+
+[lib]
+path = "fake_lib.rs"
