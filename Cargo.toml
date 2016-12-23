@@ -5,6 +5,8 @@ authors = ["Alex McArther <acmcarther@gmail.com>"]
 
 [dependencies]
 clap = "2.10.0"
+itertools = "0.5.8"
+specs = "0.7.0"
 
 [lib]
 path = "fake_lib.rs"
