@@ -16,5 +16,6 @@ rust_binary(
     ],
     deps = [
       "//common",
+      "//third_party/cargo2bazel/clap-2.19.2:clap"
     ]
 )
