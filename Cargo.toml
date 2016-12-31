@@ -7,6 +7,8 @@ authors = ["Alex McArther <acmcarther@gmail.com>"]
 clap = "2.10.0"
 itertools = "0.5.8"
 specs = "0.7.0"
+capnp = "0.7.5"
+protobuf = "1.0.24"
 
 [lib]
 path = "fake_lib.rs"
