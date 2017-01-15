@@ -8,7 +8,7 @@ load(
 rust_binary(
     name = "client",
     srcs = [
-        "main.rs",
+        "src/main.rs",
     ],
     deps = [
       "//common",

@@ -12,10 +12,10 @@ load(
 rust_binary(
     name = "server",
     srcs = [
-        "main.rs",
+        "src/main.rs",
     ],
     deps = [
-      "//common",
+      "//server/core",
       "//third_party/cargo2bazel/clap",
     ]
 )
