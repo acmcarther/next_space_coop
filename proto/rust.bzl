@@ -14,7 +14,7 @@ def rust_proto_library(
     name,
     protos = [],
     srcs = [],
-    mids = []):
+    proto_deps = []):
 
   extern_crate = "extern crate protobuf;\n"
   mod_names = ["pub mod {};".format(p_name.split(".")[0]) for p_name in protos];
@@ -24,6 +24,7 @@ def rust_proto_library(
     name = name + ".pb",
     # Pass in a list of proto_language rules
     langs = ["//proto:rust"],
+    deps = [dep + ".pb" for dep in proto_deps],
     protos = protos
   )
 
@@ -37,5 +38,5 @@ def rust_proto_library(
   rust_library(
     name = name,
     srcs = [name + "lib_rs"] + [name + ".pb"],
-    deps = ["@protoc_gen_rust//:protobuf",],
+    deps = ["@protoc_gen_rust//:protobuf",] + proto_deps,
   )

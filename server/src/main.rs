@@ -1,7 +1,9 @@
 extern crate clap;
+extern crate core;
 
 use std::str::FromStr;
 use clap::{App, Arg, ArgMatches};
+use core::Core;
 
 static EXAMPLE_COMMAND: &'static str = "space_coop -- -p 8888";
 
@@ -18,7 +20,10 @@ fn main() {
     .get_matches();
 
   // prototype2::server::start(port_from(&server_matches))
+  let port = port_from(&matches);
   println!("prospective port: {}", port_from(&matches));
+  let core = Core::new_with_port(port);
+  core.run();
 }
 
 fn port_from(matches: &ArgMatches) -> u16 {

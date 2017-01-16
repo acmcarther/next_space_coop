@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+// The time, and associated mode
+message Time {
+  enum TimeMode {
+    NORMAL = 1;
+    REPLAY = 2;
+  }
+  optional TimeMode mode = 1;
+  optional uint64 timestamp = 2;
+  optional uint64 rewind_timestamp = 3;
+}
+
+message NetworkConfig {
+  optional int32 port = 1;
+}
+
+// The total state of the game world.
+message State {
+  optional Time time = 1;
+  optional NetworkConfig network = 2;
+}

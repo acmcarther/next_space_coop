@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+import "common/pubsub/pubsub.proto";
+
+message DependencyConfig {
+  repeated string wants = 1;
+}
+
+message PubSubConfig {
+  repeated string listens_to = 1;
+  repeated string posts_to = 2;
+}
+
+message ServiceConfig {
+  // Name of the game service.
+  optional string name = 1;
+
+  // Configuration for service's dependencies
+  optional DependencyConfig dependencyConfig = 2;
+
+  // Configuration for PubSub
+  optional PubSubConfig pubSubConfig = 3;
+}
