@@ -12,13 +12,21 @@ load("//proto:rust.bzl", "rust_proto_library")
 rust_proto_library(
     name = "state_proto",
     protos = ["state.proto"],
+    proto_deps = ["//common/service:service_proto"],
+    proto_dep_crates = ["service_proto"],
 )
 
 rust_library(
     name = "core",
     srcs = glob(["src/**/*.rs"]),
     visibility = ["//server:__subpackages__"],
+    crate_type = "dylib",
     deps = [
         ":state_proto",
+        "//common/service",
+        "//common/service:service_proto",
+        "//server/service_registry",
+        "//third_party/cargo2bazel/libc",
+        "//third_party/cargo2bazel/lazy_static",
     ]
 )

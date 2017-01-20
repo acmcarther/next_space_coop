@@ -1,0 +1,6 @@
+import "pb_test_import_root_imported.proto";
+
+message ContainsImported {
+    optional ImportedMessage imported_message = 1;
+    optional ImportedEnum imported_enum = 2;
+}

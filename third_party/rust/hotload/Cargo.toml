@@ -1,0 +1,8 @@
+[package]
+name = "hotload"
+version = "0.1.0"
+authors = ["Alex McArther <acmcarther@gmail.com>"]
+
+[dependencies]
+libc = "0.2.17"
+libloading = "0.3.1"

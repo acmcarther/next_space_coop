@@ -1,0 +1,14 @@
+sudo: false
+language: rust
+rust:
+  - nightly
+  - beta
+  - stable
+script:
+  - cargo build
+  - cargo test
+  - cargo doc
+  - cargo clean
+  - cargo build --features rpc
+  - cargo test --features rpc
+  - cargo doc --features rpc

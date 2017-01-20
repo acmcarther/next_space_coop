@@ -1,0 +1,9 @@
+*.swp
+*.html
+doc
+lib
+TODO
+target/
+Cargo.lock
+*.orig
+*.swo
