@@ -6,12 +6,11 @@ load(
 )
 
 rust_binary(
-    name = "client",
+    name = "launcher",
     srcs = [
         "src/main.rs",
     ],
     deps = [
-      "//common",
       "//third_party/cargo2bazel/clap",
     ]
 )

@@ -1,4 +1,3 @@
-extern crate common;
 extern crate clap;
 
 use clap::App;
@@ -7,8 +6,6 @@ use clap::SubCommand;
 use clap::ArgMatches;
 use std::str::FromStr;
 use std::net::ToSocketAddrs;
-
-use common::SomeExcitingStruct;
 
 static EXAMPLE_COMMAND: &'static str = "space_coop -- -p 9999 -s 192.168.0.1:8888";
 
