@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package server.core;
+package common.state;
 
 import "common/service/service.proto";
 

@@ -15,17 +15,3 @@ rust_proto_library(
     proto_deps = ["//common/service:service_proto"],
     proto_dep_crates = ["service_proto"],
 )
-
-rust_library(
-    name = "core",
-    srcs = glob(["src/**/*.rs"]),
-    crate_type = "dylib",
-    deps = [
-        "//common/state:state_proto",
-        "//common/service",
-        "//common/service:service_proto",
-        "//third_party/cargo2bazel/clap",
-        "//third_party/cargo2bazel/libc",
-        "//third_party/cargo2bazel/lazy_static",
-    ]
-)

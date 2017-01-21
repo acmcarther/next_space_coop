@@ -1,5 +1,6 @@
 extern crate libc;
 extern crate libloading;
+extern crate clap;
 
 #[cfg(unix)]
 use libloading::os::unix::Symbol;
@@ -9,6 +10,7 @@ use libloading::os::windows::Symbol;
 // TODO: will not compile on windows for lack of file size
 
 use libloading::Library;
+use clap::ArgMatches;
 use std::path::PathBuf;
 use std::time::SystemTime;
 use std::time;
@@ -40,6 +42,13 @@ impl BasicProxy {
   /** Run the dylib's run function using the cached symbol */
   pub fn run(&mut self) {
     self.run_fn.as_mut().unwrap()();
+  }
+
+  /** Set application flags */
+  pub fn set_flags(&mut self, matches: ArgMatches) {
+    unsafe {
+      self.lib.get::<fn(ArgMatches)>("set_flags".as_bytes()).unwrap()(matches)
+    }
   }
 }
 

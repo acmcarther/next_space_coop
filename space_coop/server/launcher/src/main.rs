@@ -15,6 +15,12 @@ static EXAMPLE_COMMAND: &'static str = "space_coop -- -d ./core/libcore.so";
 fn main() {
   let matches = App::new("space coop")
     .usage(EXAMPLE_COMMAND)
+    .arg(Arg::with_name("port")
+      .short("p")
+      .long("port")
+      .default_value("8829")
+      .help("Port to host on")
+      .takes_value(true))
     .arg(Arg::with_name("dylib_path")
       .short("d")
       .long("dylib")
@@ -33,14 +39,11 @@ fn main() {
   println!("current_dir:{:?}", env::current_dir());
   println!("dylib_path:{:?}", PathBuf::from(dylib_path.clone()));
   let mut hotloader = Hotloader::<BasicProxy>::new(PathBuf::from(dylib_path));
+  hotloader.get_proxy().unwrap().set_flags(matches);
   loop {
     hotloader.get_proxy().unwrap().run();
     thread::sleep(Duration::from_millis(200));
   }
-}
-
-fn port_from(matches: &ArgMatches) -> u16 {
-  matches.value_of("port").and_then(|v| u16::from_str(&v).ok()).unwrap()
 }
 
 fn dylib_from(matches: &ArgMatches) -> String {
