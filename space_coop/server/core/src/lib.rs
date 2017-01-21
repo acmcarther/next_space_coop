@@ -3,9 +3,14 @@ extern crate service;
 extern crate libc;
 extern crate clap;
 extern crate protobuf;
+extern crate fern;
+extern crate time;
 
 #[macro_use]
 extern crate lazy_static;
+
+#[macro_use]
+extern crate log;
 
 mod game;
 
@@ -28,6 +33,19 @@ use game::GameServer;
 
 lazy_static! {
   static ref GAME_STATE: Mutex<GameServer> = {
+    let logger_config = fern::DispatchConfig {
+        format: Box::new(|msg: &str, level: &log::LogLevel, _location: &log::LogLocation| {
+            // This is a fairly simple format, though it's possible to do more complicated ones.
+            // This closure can contain any code, as long as it produces a String message.
+            format!("[{}][{}] {}", time::now().strftime("%Y-%m-%d][%H:%M:%S").unwrap(), level, msg)
+        }),
+        output: vec![fern::OutputConfig::stdout(), fern::OutputConfig::file("logs/server.log")],
+        level: log::LogLevelFilter::Trace,
+    };
+
+    fern::init_global_logger(logger_config, log::LogLevelFilter::Trace)
+      .expect("could not load logger");
+
     io::stdout().write(b"hotload!\n").unwrap();
     io::stdout().flush().unwrap();
     Mutex::new(GameServer::new())
