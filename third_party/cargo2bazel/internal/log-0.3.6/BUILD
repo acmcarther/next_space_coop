@@ -24,5 +24,6 @@ rust_library(
     deps = [
       
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    crate_features = ["use_std"]
 )
