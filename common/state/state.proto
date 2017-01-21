@@ -24,4 +24,5 @@ message State {
   optional Time time = 1;
   optional NetworkConfig network = 2;
   repeated common.service.RunningService services = 3;
+  repeated common.service.Resource resources = 4;
 }

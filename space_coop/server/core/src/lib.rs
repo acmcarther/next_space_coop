@@ -45,7 +45,7 @@ lazy_static! {
 
     fern::init_global_logger(logger_config, log::LogLevelFilter::Trace)
       .expect("could not load logger");
-    info!("hotloaded successfully");
+    info!("Hotloaded successfully");
 
     Mutex::new(GameServer::new())
   };
@@ -66,7 +66,7 @@ mod ffi {
   #[no_mangle]
   pub fn set_flags(matches: ArgMatches) {
     GAME_STATE.lock().unwrap().set_flags(matches);
-    info!("set flags for dylib");
+    info!("Set flags for dylib");
   }
 
   #[no_mangle]
@@ -76,7 +76,7 @@ mod ffi {
     let mut state_bytes = unsafe { Box::from_raw(state as *mut Vec<u8>) };
     let state = protobuf::parse_from_bytes(&state_bytes).unwrap();
     GAME_STATE.lock().unwrap().initialize(state);
-    info!("initialized dylib from prior state");
+    info!("Initialized dylib from prior state");
   }
 
   #[no_mangle]
@@ -89,7 +89,7 @@ mod ffi {
     let state = GAME_STATE.lock().unwrap().dump_state();
     let bytes = state.write_to_bytes().unwrap();
 
-    info!("dumping internal state in preparation for unload");
+    info!("Dumping internal state in preparation for unload");
     Box::into_raw(Box::new(bytes)) as *mut libc::c_void
   }
 

@@ -2,8 +2,6 @@ syntax = "proto2";
 
 package common.service;
 
-import "common/pubsub/pubsub.proto";
-
 message DependencyConfig {
   repeated string wants_services = 1;
   repeated string wants_data = 2;
@@ -16,9 +14,6 @@ message ServiceConfig {
 
   // Configuration for service's dependencies
   optional DependencyConfig dependency_config = 2;
-
-  // Configuration for PubSub
-  optional common.pubsub.PubSubConfig pubsub_config = 3;
 }
 
 message RunningService {
@@ -27,4 +22,12 @@ message RunningService {
 
   // Service state
   optional bytes state = 2;
+}
+
+message Resource {
+  // Specifier for a resource
+  optional string name = 1;
+
+  // Resource payload
+  optional bytes data = 2;
 }

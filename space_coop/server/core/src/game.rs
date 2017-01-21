@@ -52,7 +52,7 @@ impl GameServer {
 
     let next_timestamp = self.state.get_time().get_timestamp().clone() + microsecond_delta;
     self.state.mut_time().set_timestamp(next_timestamp);
-    info!("ran with internal timestamp: {:?}", self.state.get_time().get_timestamp());
+    info!("Ran with internal timestamp: {:?}", self.state.get_time().get_timestamp());
 
     self.try_save_snapshot();
   }
@@ -68,7 +68,7 @@ impl GameServer {
     if let Some(s) = state {
       self.state = s;
       let t = self.state.get_time().get_timestamp();
-      info!("loaded from snapshot with timestamp: {}", t);
+      info!("Loaded from snapshot with timestamp: {}", t);
     }
   }
 
@@ -84,10 +84,10 @@ impl GameServer {
     match (File::create(snapshot_file.clone()).ok(), self.state.write_to_bytes().ok()) {
       (Some(mut file), Some(bytes)) => {
         file.write_all(&bytes);
-        trace!("wrote snap to {:?}", snapshot_file);
+        trace!("Wrote snap to {:?}", snapshot_file);
       },
       _ => {
-        trace!("failed to write snap to {:?}", snapshot_file);
+        trace!("Failed to write snap to {:?}", snapshot_file);
       }
     }
   }

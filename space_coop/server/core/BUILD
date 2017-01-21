@@ -9,13 +9,6 @@ load("@org_pubref_rules_protobuf//protobuf:rules.bzl", "proto_compile")
 load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cc_proto_compile")
 load("//tools/bazel/proto:rust.bzl", "rust_proto_library")
 
-rust_proto_library(
-    name = "state_proto",
-    protos = ["state.proto"],
-    proto_deps = ["//common/service:service_proto"],
-    proto_dep_crates = ["service_proto"],
-)
-
 rust_library(
     name = "core",
     srcs = glob(["src/**/*.rs"]),
