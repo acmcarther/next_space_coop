@@ -18,7 +18,7 @@ fn main() {
     .arg(Arg::with_name("dylib_path")
       .short("d")
       .long("dylib")
-      .default_value("./bazel-bin/server/core/libcore.so")
+      .default_value("./bazel-bin/space_coop/server/core/libcore.so")
       .help("Path to dylib")
       .takes_value(true))
     .get_matches();

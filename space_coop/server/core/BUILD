@@ -25,7 +25,7 @@ rust_library(
         ":state_proto",
         "//common/service",
         "//common/service:service_proto",
-        "//server/service_registry",
+        "//space_coop/server/service_registry",
         "//third_party/cargo2bazel/libc",
         "//third_party/cargo2bazel/lazy_static",
     ]

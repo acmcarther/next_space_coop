@@ -13,6 +13,6 @@ rust_library(
       "//common/service",
       "//third_party/cargo2bazel/specs",
       "//third_party/cargo2bazel/itertools",
-      "//server/sample_service",
+      "//space_coop/server/sample_service",
     ]
 )
