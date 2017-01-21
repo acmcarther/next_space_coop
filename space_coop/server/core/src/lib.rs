@@ -13,6 +13,7 @@ extern crate lazy_static;
 extern crate log;
 
 mod game;
+mod network;
 
 use state_proto::state::Time;
 use state_proto::state::Time_TimeMode;
@@ -61,12 +62,31 @@ mod ffi {
   use std::io::Write;
   use std::mem;
   use std::str::FromStr;
+  use game::TransientState;
   use ::clap::ArgMatches;
 
   #[no_mangle]
   pub fn set_flags(matches: ArgMatches) {
     GAME_STATE.lock().unwrap().set_flags(matches);
     info!("Set flags for dylib");
+  }
+
+  #[no_mangle]
+  pub fn set_transient_state(state: *mut libc::c_void) {
+    use std::ops::DerefMut;
+    info!("Setting transient state");
+
+    let mut transient_state = unsafe { Box::from_raw(state as *mut Option<TransientState>) };
+    let mut unboxed_state: Option<TransientState> = None;
+    mem::swap(transient_state.deref_mut(), &mut unboxed_state);
+    GAME_STATE.lock().unwrap().set_transient_state(unboxed_state.unwrap());
+  }
+
+  #[no_mangle]
+  pub fn get_transient_state() -> *mut libc::c_void {
+    info!("Extracting transient state");
+    let mut boxed_state = Box::new(Some(GAME_STATE.lock().unwrap().dump_transient_state()));
+    Box::into_raw(boxed_state) as *mut libc::c_void
   }
 
   #[no_mangle]

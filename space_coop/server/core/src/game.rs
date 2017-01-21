@@ -14,9 +14,14 @@ use std::io::Write;
 use std::io;
 use std::str::FromStr;
 
+pub struct TransientState {
+  
+}
+
 pub struct GameServer {
   state: State,
-  last_run_time: PreciseTime
+  last_run_time: PreciseTime,
+  transient: Option<TransientState>,
 }
 
 impl GameServer {
@@ -24,10 +29,22 @@ impl GameServer {
     let mut server = GameServer {
       state: State::new(),
       last_run_time: PreciseTime::now(),
+      transient: None
     };
 
     server.try_load_snapshot();
     server
+  }
+
+  pub fn set_transient_state(&mut self, transient: TransientState) {
+    self.transient = Some(transient);
+  }
+
+
+  pub fn dump_transient_state(&mut self) -> TransientState {
+    self.transient
+      .take()
+      .expect("Tried to dump non-existent transient state")
   }
 
   pub fn set_flags(&mut self, matches: ArgMatches) {
@@ -45,6 +62,8 @@ impl GameServer {
   }
 
   pub fn run(&mut self) {
+    self.try_load_transient_state();
+
     let now = PreciseTime::now();
     let delta = self.last_run_time.to(now.clone());
     self.last_run_time = now;
@@ -52,9 +71,11 @@ impl GameServer {
 
     let next_timestamp = self.state.get_time().get_timestamp().clone() + microsecond_delta;
     self.state.mut_time().set_timestamp(next_timestamp);
-    info!("Ran with internal timestamp: {:?}", self.state.get_time().get_timestamp());
+    trace!("Ran with internal timestamp: {:?}", self.state.get_time().get_timestamp());
 
     self.try_save_snapshot();
+
+
   }
 
   fn try_load_snapshot(&mut self) {
@@ -90,5 +111,8 @@ impl GameServer {
         trace!("Failed to write snap to {:?}", snapshot_file);
       }
     }
+  }
+
+  pub fn try_load_transient_state(&mut self) {
   }
 }
