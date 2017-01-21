@@ -1,7 +1,0 @@
-syntax = "proto2";
-
-package server.sample_service;
-
-message SampleServiceState {
-  optional bool a_bool = 1;
-}
