@@ -2,12 +2,12 @@ syntax = "proto2";
 
 package common.pubsub;
 
-message Config {
+message PubSubConfig {
   repeated string listens_to = 1;
   repeated string posts_to = 2;
 }
 
-message Message {
+message PubSubMessage {
   optional string source = 1;
   optional bytes payload = 2;
 }

@@ -14,11 +14,14 @@ def rust_proto_library(
     name,
     protos = [],
     srcs = [],
-    proto_deps = []):
+    proto_deps = [],
+    proto_dep_crates = []):
 
-  extern_crate = "extern crate protobuf;\n"
+  extern_crates = ["extern crate protobuf;"] + ["extern crate {};".format(dep) for dep in proto_dep_crates]
+
+  proto_dep_uses = ["pub use {}::*;".format(dep) for dep in proto_dep_crates]
   mod_names = ["pub mod {};".format(p_name.split(".")[0]) for p_name in protos];
-  lib_rs_content = extern_crate + "\n".join(mod_names)
+  lib_rs_content = "\n".join(extern_crates) + "\n".join(proto_dep_uses) + "\n".join(mod_names)
 
   proto_compile(
     name = name + ".pb",

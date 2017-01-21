@@ -13,4 +13,14 @@ rust_proto_library(
     name = "service_proto",
     protos = ["service.proto"],
     proto_deps = ["//common/pubsub:pubsub_proto"],
+    proto_dep_crates = ["pubsub_proto"],
+)
+
+rust_library(
+    name = "service",
+    srcs = glob(["src/**/*.rs"]),
+    deps = [
+      ":service_proto",
+      "//third_party/cargo2bazel/specs",
+    ]
 )

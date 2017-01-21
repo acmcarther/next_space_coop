@@ -1,14 +1,13 @@
 syntax = "proto2";
 
+package common.service;
+
 import "common/pubsub/pubsub.proto";
 
 message DependencyConfig {
-  repeated string wants = 1;
-}
-
-message PubSubConfig {
-  repeated string listens_to = 1;
-  repeated string posts_to = 2;
+  repeated string wants_services = 1;
+  repeated string wants_data = 2;
+  repeated string provides_data = 3;
 }
 
 message ServiceConfig {
@@ -16,8 +15,16 @@ message ServiceConfig {
   optional string name = 1;
 
   // Configuration for service's dependencies
-  optional DependencyConfig dependencyConfig = 2;
+  optional DependencyConfig dependency_config = 2;
 
   // Configuration for PubSub
-  optional PubSubConfig pubSubConfig = 3;
+  optional common.pubsub.PubSubConfig pubsub_config = 3;
+}
+
+message RunningService {
+  // Configuration specifying a service
+  optional ServiceConfig config = 1;
+
+  // Service state
+  optional bytes state = 2;
 }

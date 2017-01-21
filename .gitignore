@@ -4,4 +4,4 @@ bazel-bin
 bazel-genfiles
 bazel-out
 bazel-testlogs
-third_party/cargo2bazel
+/third_party/cargo2bazel/**/*.tar

@@ -1,5 +1,9 @@
 syntax = "proto2";
 
+package server.core;
+
+import "common/service/service.proto";
+
 // The time, and associated mode
 message Time {
   enum TimeMode {
@@ -19,4 +23,5 @@ message NetworkConfig {
 message State {
   optional Time time = 1;
   optional NetworkConfig network = 2;
+  repeated common.service.RunningService services = 3;
 }

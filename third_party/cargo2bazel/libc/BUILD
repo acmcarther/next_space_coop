@@ -1,0 +1,11 @@
+# This is a direct dependency
+# You've come to the right place!
+package(default_visibility = ["//visibility:public"])
+
+# TODO: we don't actually know this
+licenses(["notice"])
+
+alias(
+  name = "libc",
+  actual = "//third_party/cargo2bazel/internal/libc-0.2.18:libc",
+)

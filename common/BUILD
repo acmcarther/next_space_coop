@@ -20,13 +20,3 @@ rust_library(
     ],
     deps = [":some_proto"],
 )
-
-cc_proto_compile(
-    name = "test-cpp",
-    protos = ["some.proto"]
-)
-
-rust_proto_library(
-    name = "some_proto",
-    protos = ["some.proto"],
-)
