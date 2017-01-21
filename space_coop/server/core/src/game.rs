@@ -4,8 +4,9 @@ use state_proto::state::NetworkConfig;
 use state_proto::state::State;
 
 use clap::ArgMatches;
-use protobuf;
 use protobuf::Message;
+use time::PreciseTime;
+use protobuf;
 use std::env;
 use std::fs::File;
 use std::fs;
@@ -15,12 +16,14 @@ use std::str::FromStr;
 
 pub struct GameServer {
   state: State,
+  last_run_time: PreciseTime
 }
 
 impl GameServer {
   pub fn new() -> GameServer {
     let mut server = GameServer {
-      state: State::new()
+      state: State::new(),
+      last_run_time: PreciseTime::now(),
     };
 
     server.try_load_snapshot();
@@ -42,9 +45,14 @@ impl GameServer {
   }
 
   pub fn run(&mut self) {
-    let next_timestamp = self.state.get_time().get_timestamp().clone() + 1;
+    let now = PreciseTime::now();
+    let delta = self.last_run_time.to(now.clone());
+    self.last_run_time = now;
+    let microsecond_delta = delta.num_microseconds().expect("time between runs was way too long (over 280k years!)");
+
+    let next_timestamp = self.state.get_time().get_timestamp().clone() + microsecond_delta;
     self.state.mut_time().set_timestamp(next_timestamp);
-    trace!("ran with internal timestamp: {:?}", self.state.get_time().get_timestamp());
+    info!("ran with internal timestamp: {:?}", self.state.get_time().get_timestamp());
 
     self.try_save_snapshot();
   }

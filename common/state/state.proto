@@ -11,8 +11,8 @@ message Time {
     REPLAY = 2;
   }
   optional TimeMode mode = 1;
-  optional uint64 timestamp = 2;
-  optional uint64 rewind_timestamp = 3;
+  optional int64 timestamp = 2;
+  optional int64 rewind_timestamp = 3;
 }
 
 message NetworkConfig {
