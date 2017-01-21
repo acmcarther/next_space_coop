@@ -21,11 +21,12 @@ rust_library(
     srcs = glob(["src/**/*.rs"]),
     crate_type = "dylib",
     deps = [
+        "@protoc_gen_rust//:protobuf",
         "//common/state:state_proto",
         "//common/service",
         "//common/service:service_proto",
-        "//third_party/cargo2bazel/clap",
         "//third_party/cargo2bazel/libc",
+        "//third_party/cargo2bazel/clap",
         "//third_party/cargo2bazel/lazy_static",
     ]
 )
