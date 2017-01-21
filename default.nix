@@ -4,6 +4,7 @@ let
   pkgs = import <nixpkgs> {};
 in pkgs.stdenv.mkDerivation rec {
   name = "space_coop";
+  buildInputs = [ pkgs.inotify-tools ];
   shellHook = ''
     # Allow my shell to add custom snippet
     export IS_NIX_SHELL=1
