@@ -27,5 +27,8 @@ rust_library(
     "//third_party/cargo2bazel/internal/rand-0.3.15:rand",
     "//third_party/cargo2bazel/internal/rustc-serialize-0.3.22:rustc_serialize"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

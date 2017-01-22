@@ -28,5 +28,8 @@ rust_library(
     "//third_party/cargo2bazel/internal/thread_local-0.3.2:thread_local",
     "//third_party/cargo2bazel/internal/utf8-ranges-1.0.0:utf8_ranges"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

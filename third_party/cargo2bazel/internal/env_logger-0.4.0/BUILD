@@ -25,5 +25,8 @@ rust_library(
       "//third_party/cargo2bazel/internal/log-0.3.6:log",
     "//third_party/cargo2bazel/internal/regex-0.2.1:regex"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

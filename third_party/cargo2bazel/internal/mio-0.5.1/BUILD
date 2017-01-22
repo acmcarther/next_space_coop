@@ -32,5 +32,8 @@ rust_library(
     "//third_party/cargo2bazel/internal/time-0.1.35:time",
     "//third_party/cargo2bazel/internal/winapi-0.2.8:winapi"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

@@ -26,5 +26,8 @@ rust_library(
     "//third_party/cargo2bazel/internal/phf_codegen-0.7.20:phf_codegen",
     "//third_party/cargo2bazel/internal/serde_json-0.8.6:serde_json"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

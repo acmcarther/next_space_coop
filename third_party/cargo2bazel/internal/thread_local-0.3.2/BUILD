@@ -25,5 +25,8 @@ rust_library(
       "//third_party/cargo2bazel/internal/thread-id-3.0.0:thread_id",
     "//third_party/cargo2bazel/internal/unreachable-0.1.1:unreachable"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

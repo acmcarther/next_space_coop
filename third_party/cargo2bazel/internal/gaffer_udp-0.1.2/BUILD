@@ -26,5 +26,8 @@ rust_library(
     "//third_party/cargo2bazel/internal/itertools-0.4.19:itertools",
     "//third_party/cargo2bazel/internal/mio-0.5.1:mio"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

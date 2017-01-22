@@ -28,5 +28,8 @@ rust_library(
     "//third_party/cargo2bazel/internal/ncollide_utils-0.5.0:ncollide_utils",
     "//third_party/cargo2bazel/internal/rustc-serialize-0.3.22:rustc_serialize"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

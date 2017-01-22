@@ -30,5 +30,8 @@ rust_library(
     "//third_party/cargo2bazel/internal/tuple_utils-0.2.0:tuple_utils"
     ],
     srcs = glob(["lib.rs", "src/**/*.rs"]),
-    crate_features = ["parallel"],
+    crate_features = ["parallel"]
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

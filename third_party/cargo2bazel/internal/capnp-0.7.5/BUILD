@@ -24,5 +24,8 @@ rust_library(
     deps = [
       "//third_party/cargo2bazel/internal/byteorder-0.4.2:byteorder"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

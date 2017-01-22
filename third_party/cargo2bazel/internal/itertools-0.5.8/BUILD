@@ -24,5 +24,8 @@ rust_library(
     deps = [
       "//third_party/cargo2bazel/internal/either-1.0.2:either"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

@@ -31,5 +31,8 @@ rust_library(
     "//third_party/cargo2bazel/internal/unicode-width-0.1.4:unicode_width",
     "//third_party/cargo2bazel/internal/vec_map-0.6.0:vec_map"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )

@@ -27,5 +27,8 @@ rust_library(
     "//third_party/cargo2bazel/internal/num-traits-0.1.36:num_traits",
     "//third_party/cargo2bazel/internal/serde-0.8.22:serde"
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
+    rustc_flags = [
+      "--cap-lints warn",
+    ],
 )
