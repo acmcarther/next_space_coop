@@ -19,6 +19,7 @@ rust_library(
         "//common/service",
         "//common/service:service_proto",
         "//third_party/cargo2bazel/log",
+        "//third_party/cargo2bazel/gaffer_udp",
         "//third_party/cargo2bazel/fern",
         "//third_party/cargo2bazel/time",
         "//third_party/cargo2bazel/libc",

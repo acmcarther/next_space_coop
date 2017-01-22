@@ -13,11 +13,41 @@ use std::fs;
 use std::io::Write;
 use std::io;
 use std::str::FromStr;
+use network::Network;
 
-pub struct TransientState {
-  
+/**
+ * The "opaque pointer" that this dylib's state is cast to.
+ *
+ * WARNING: CHANGING THIS CLASS WHILE HOTLOADING CAN LEAD TO UNDEFINED BEHAVIOR
+ */
+pub struct OpaqueState {
+  pub state_bytes: Vec<u8>,
+  pub transient_state: TransientState,
 }
 
+/**
+ * Per-execution properties that persist while hotloading, but can be dropped between snapshot
+ * loads.
+ *
+ * WARNING: CHANGING THIS CLASS WHILE HOTLOADING CAN LEAD TO UNDEFINED BEHAVIOR
+ */
+pub struct TransientState {
+  network: Network
+}
+
+impl TransientState {
+  pub fn new(network: Network) -> TransientState {
+    TransientState {
+      network: network
+    }
+  }
+}
+
+/**
+ * The whole state of the game system.
+ *
+ * This struct is safe to change while hotloading
+ */
 pub struct GameServer {
   state: State,
   last_run_time: PreciseTime,
@@ -31,20 +61,7 @@ impl GameServer {
       last_run_time: PreciseTime::now(),
       transient: None
     };
-
-    server.try_load_snapshot();
     server
-  }
-
-  pub fn set_transient_state(&mut self, transient: TransientState) {
-    self.transient = Some(transient);
-  }
-
-
-  pub fn dump_transient_state(&mut self) -> TransientState {
-    self.transient
-      .take()
-      .expect("Tried to dump non-existent transient state")
   }
 
   pub fn set_flags(&mut self, matches: ArgMatches) {
@@ -53,16 +70,23 @@ impl GameServer {
     self.state.mut_network().set_port(port as i32);
   }
 
-  pub fn initialize(&mut self, state: State) {
-    self.state = state;
+  pub fn initialize(&mut self, opaque_state: Box<OpaqueState>) {
+    self.state = protobuf::parse_from_bytes(&opaque_state.state_bytes).unwrap();
+    self.transient = Some(opaque_state.transient_state);
+    info!("Initialized dylib from prior state with timestamp {}", self.state.get_time().get_timestamp());
   }
 
-  pub fn dump_state(&mut self) -> State {
-    self.state.clone()
+  pub fn dump_state(&mut self) -> OpaqueState {
+    info!("Unloading state for snapshot {}", self.state.get_time().get_timestamp());
+    OpaqueState {
+      state_bytes: self.state.write_to_bytes().unwrap(),
+      transient_state: self.transient.take()
+        .expect("tried to dump transient before installing it from a prior state, or initializing it"),
+    }
   }
 
   pub fn run(&mut self) {
-    self.try_load_transient_state();
+    self.try_to_load_first_time();
 
     let now = PreciseTime::now();
     let delta = self.last_run_time.to(now.clone());
@@ -74,8 +98,6 @@ impl GameServer {
     trace!("Ran with internal timestamp: {:?}", self.state.get_time().get_timestamp());
 
     self.try_save_snapshot();
-
-
   }
 
   fn try_load_snapshot(&mut self) {
@@ -113,6 +135,13 @@ impl GameServer {
     }
   }
 
-  pub fn try_load_transient_state(&mut self) {
+  pub fn try_to_load_first_time(&mut self) {
+    if self.transient.is_none() {
+      info!("Initializing transient state objects");
+      let network = Network::new(self.state.get_network().get_port() as u16);
+      self.transient = Some(TransientState::new(network));
+      info!("Attempting to load from snapshot");
+      self.try_load_snapshot();
+    }
   }
 }
