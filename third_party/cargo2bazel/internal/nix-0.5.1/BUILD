@@ -22,7 +22,7 @@ licenses(["notice"])
 rust_library(
     name = "nix",
     deps = [
-      "//third_party/cargo2bazel/internal/bitflags-0.4.0:bitflags",
+      "//third_party/cargo2bazel/internal/bitflags-1.0.0:bitflags",
     "//third_party/cargo2bazel/internal/libc-0.2.18:libc"
     ],
     srcs = glob(["lib.rs", "src/**/*.rs"]),

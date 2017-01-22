@@ -24,6 +24,7 @@ rust_library(
     deps = [
       "//third_party/cargo2bazel/internal/kernel32-sys-0.2.2:kernel32_sys",
     "//third_party/cargo2bazel/internal/lazy_static-0.2.2:lazy_static",
+    "//third_party/cargo2bazel/internal/target_build_utils-0.1.2:target_build_utils",
     "//third_party/cargo2bazel/internal/winapi-0.2.8:winapi"
     ],
     srcs = glob(["lib.rs", "src/**/*.rs"]),

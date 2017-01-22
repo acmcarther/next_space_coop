@@ -25,7 +25,7 @@ rust_library(
       "//third_party/cargo2bazel/internal/dtoa-0.2.2:dtoa",
     "//third_party/cargo2bazel/internal/itoa-0.1.1:itoa",
     "//third_party/cargo2bazel/internal/num-traits-0.1.36:num_traits",
-    "//third_party/cargo2bazel/internal/serde-0.8.22:serde"
+    "//third_party/cargo2bazel/internal/serde-0.8.23:serde"
     ],
     srcs = glob(["lib.rs", "src/**/*.rs"]),
     rustc_flags = [

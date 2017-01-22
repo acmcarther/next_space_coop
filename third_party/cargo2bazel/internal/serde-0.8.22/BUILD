@@ -25,7 +25,7 @@ rust_library(
       
     ],
     srcs = glob(["lib.rs", "src/**/*.rs"]),
-    crate_features = ["std"],
+    crate_features = ["use_std"],
     rustc_flags = [
       "--cap-lints warn",
     ],

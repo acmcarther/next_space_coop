@@ -7,5 +7,5 @@ licenses(["notice"])
 
 alias(
   name = "itertools",
-  actual = "//third_party/cargo2bazel/internal/itertools-0.5.8:itertools",
+  actual = "//third_party/cargo2bazel/internal/itertools-0.5.9:itertools",
 )

@@ -7,5 +7,5 @@ licenses(["notice"])
 
 alias(
   name = "gaffer_udp",
-  actual = "//third_party/cargo2bazel/internal/gaffer_udp-0.1.2:gaffer_udp",
+  actual = "//third_party/cargo2bazel/internal/gaffer_udp-0.1.3:gaffer_udp",
 )

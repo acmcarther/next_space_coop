@@ -7,5 +7,5 @@ licenses(["notice"])
 
 alias(
   name = "protobuf",
-  actual = "//third_party/cargo2bazel/internal/protobuf-1.0.24:protobuf",
+  actual = "//third_party/cargo2bazel/internal/protobuf-1.1.0:protobuf",
 )

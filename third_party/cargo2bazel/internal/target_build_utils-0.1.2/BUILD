@@ -22,8 +22,8 @@ licenses(["notice"])
 rust_library(
     name = "target_build_utils",
     deps = [
-      "//third_party/cargo2bazel/internal/phf-0.7.20:phf",
-    "//third_party/cargo2bazel/internal/phf_codegen-0.7.20:phf_codegen",
+      "//third_party/cargo2bazel/internal/phf-0.7.21:phf",
+    "//third_party/cargo2bazel/internal/phf_codegen-0.7.21:phf_codegen",
     "//third_party/cargo2bazel/internal/serde_json-0.8.6:serde_json"
     ],
     srcs = glob(["lib.rs", "src/**/*.rs"]),

@@ -7,5 +7,5 @@ licenses(["notice"])
 
 alias(
   name = "time",
-  actual = "//third_party/cargo2bazel/internal/time-0.1.35:time",
+  actual = "//third_party/cargo2bazel/internal/time-0.1.36:time",
 )
