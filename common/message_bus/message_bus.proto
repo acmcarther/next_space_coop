@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package common.message_bus;
+
+message BusMessage {
+  optional string path = 1;
+  optional string origin = 2;
+  optional bytes payload = 3;
+}
