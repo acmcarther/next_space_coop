@@ -15,3 +15,12 @@ New thing: If you're seeing "cant find libstdc++.so.6" when trying to compile a 
 That possibly fixed stuff for me.
 
 Or try adding gcc and libc dependencies @ OS level, and rebooting.
+
+
+==================================
+
+dont forget to --action_env=PATH="$PATH" --action_env=LD_LIBRARY_PATH="$LD_LIBRARY_PATH" because the ones in bazel.rc dont work yet
+
+https://github.com/bazelbuild/bazel/issues/2035
+
+https://bazel-review.googlesource.com/#/c/7211/
