@@ -7,3 +7,11 @@ Had to patch the java to let me override the bazel shell in non-bsd or windows e
 Had to patch-elf the rust version that comes down the pipe. If you see "rustc: No such file or directory" even though the executable is there, thats because you didn't patchelf.
 
 No idea how to fix this "scalably". Maybe someone else has already solved the problem somewhere else.
+
+=================================
+
+New thing: If you're seeing "cant find libstdc++.so.6" when trying to compile a protobuf thing, try commenting out tools/bazel.rc contents. Then, build again, and comment it back out.
+
+That possibly fixed stuff for me.
+
+Or try adding gcc and libc dependencies @ OS level, and rebooting.

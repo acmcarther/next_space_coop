@@ -53,8 +53,8 @@ rust_repositories()
 
 git_repository(
   name = "org_pubref_rules_protobuf",
-  remote = "https://github.com/pubref/rules_protobuf",
-  tag = "v0.7.1",
+  remote = "https://github.com/acmcarther/rules_protobuf",
+  commit = "31040f9",
 )
 
 load("@org_pubref_rules_protobuf//protobuf:rules.bzl", "proto_repositories")
@@ -66,7 +66,7 @@ cpp_proto_repositories()
 new_git_repository(
     name = "protoc_gen_rust",
     remote = "https://github.com/acmcarther/rust-protobuf",
-    commit = "a69692c",
+    commit = "f3af1e3",
     build_file_content = """
 package(default_visibility = ["//visibility:public"])
 
@@ -78,7 +78,8 @@ load(
 
 rust_library(
   name = "protobuf",
-  srcs = ["src/lib/protobuf.rs"],
+  srcs = glob(["src/lib/**/*.rs"]),
+  crate_root = "src/lib/protobuf.rs",
 )
 rust_binary(
   name = "protoc_gen_rust",

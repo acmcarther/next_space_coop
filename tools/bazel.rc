@@ -1,3 +1,3 @@
-build --action_env=CARGO_PKG_VERSION=mock --action_env=CARGO_PKG_AUTHORS=mock
-run --action_env=CARGO_PKG_VERSION=mock --action_env=CARGO_PKG_AUTHORS=mock
-test --action_env=CARGO_PKG_VERSION=mock --action_env=CARGO_PKG_AUTHORS=mock
+build --action_env=CARGO_PKG_VERSION=mock2 --action_env=CARGO_PKG_AUTHORS=mock2 --action_env=LD_LIBRARY_PATH --action_env=PATH --action_env=TMPDIR --test_env=PATH --test_env=LD_LIBRARY_PATH
+run --action_env=CARGO_PKG_VERSION=mock2 --action_env=CARGO_PKG_AUTHORS=mock2 --action_env=LD_LIBRARY_PATH --action_env=PATH --action_env=TMPDIR --test_env=PATH --test_env=LD_LIBRARY_PATH
+test --action_env=CARGO_PKG_VERSION=mock2 --action_env=CARGO_PKG_AUTHORS=mock2 --action_env=LD_LIBRARY_PATH --action_env=PATH --action_env=TMPDIR --test_env=PATH --test_env=LD_LIBRARY_PATH
