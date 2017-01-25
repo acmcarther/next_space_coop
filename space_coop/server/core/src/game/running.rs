@@ -1,8 +1,9 @@
-use state_proto::state::Time;
-use state_proto::state::Time_TimeMode;
+
+use ::network::Network;
 use state_proto::state::NetworkConfig;
 use state_proto::state::State;
-use ::network::Network;
+use state_proto::state::Time;
+use state_proto::state::Time_TimeMode;
 use super::TransientState;
 use time::PreciseTime;
 
@@ -28,7 +29,8 @@ impl RunningGame {
     let delta = self.last_run_time.to(now.clone());
 
     self.last_run_time = now;
-    let microsecond_delta = delta.num_microseconds().expect("time between runs was way too long (over 280k years!)");
+    let microsecond_delta = delta.num_microseconds()
+      .expect("time between runs was way too long (over 280k years!)");
     let next_timestamp = self.state.get_time().get_timestamp().clone() + microsecond_delta;
     self.state.mut_time().set_timestamp(next_timestamp);
   }

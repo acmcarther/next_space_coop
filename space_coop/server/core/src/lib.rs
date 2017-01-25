@@ -16,22 +16,22 @@ extern crate log;
 mod game;
 mod network;
 
-use state_proto::state::Time;
-use state_proto::state::Time_TimeMode;
-use state_proto::state::NetworkConfig;
-use state_proto::state::State;
-use service::Service;
-
-use std::ptr;
-use std::io;
-use std::io::Write;
-
-use std::sync::Mutex;
-use std::mem;
 
 pub use ffi::*;
 
 use game::GameServer;
+use service::Service;
+use state_proto::state::NetworkConfig;
+use state_proto::state::State;
+use state_proto::state::Time;
+use state_proto::state::Time_TimeMode;
+use std::io;
+use std::io::Write;
+use std::mem;
+
+use std::ptr;
+
+use std::sync::Mutex;
 
 lazy_static! {
   static ref GAME_STATE: Mutex<GameServer> = {
@@ -52,17 +52,17 @@ lazy_static! {
 }
 
 mod ffi {
+  use ::clap::ArgMatches;
+  use game::OpaqueState;
   use ::libc;
   use ::protobuf;
   use ::protobuf::Message;
-  use super::GAME_STATE;
   use state_proto::state::State;
   use std::io;
   use std::io::Write;
   use std::mem;
   use std::str::FromStr;
-  use game::OpaqueState;
-  use ::clap::ArgMatches;
+  use super::GAME_STATE;
 
   #[no_mangle]
   pub fn set_flags(matches: ArgMatches) {

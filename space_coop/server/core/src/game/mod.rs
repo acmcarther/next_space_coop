@@ -1,22 +1,22 @@
 mod running;
 
-use state_proto::state::Time;
-use state_proto::state::Time_TimeMode;
-use state_proto::state::NetworkConfig;
-use state_proto::state::State;
 
 use clap::ArgMatches;
-use protobuf::Message;
-use time::PreciseTime;
-use protobuf;
-use std::env;
-use std::fs::File;
-use std::fs;
-use std::io::Write;
-use std::io;
-use std::str::FromStr;
 use network::Network;
+use protobuf;
+use protobuf::Message;
 use self::running::RunningGame;
+use state_proto::state::NetworkConfig;
+use state_proto::state::State;
+use state_proto::state::Time;
+use state_proto::state::Time_TimeMode;
+use std::env;
+use std::fs;
+use std::fs::File;
+use std::io;
+use std::io::Write;
+use std::str::FromStr;
+use time::PreciseTime;
 
 /**
  * The "opaque pointer" that this dylib's state is cast to.
@@ -35,14 +35,12 @@ pub struct OpaqueState {
  * WARNING: CHANGING THIS CLASS WHILE HOTLOADING CAN LEAD TO UNDEFINED BEHAVIOR
  */
 pub struct TransientState {
-  network: Network
+  network: Network,
 }
 
 impl TransientState {
   pub fn new(network: Network) -> TransientState {
-    TransientState {
-      network: network
-    }
+    TransientState { network: network }
   }
 }
 
@@ -77,7 +75,8 @@ impl GameServer {
    */
   pub fn set_flags(&mut self, matches: ArgMatches) {
     let port = matches.value_of("port")
-      .and_then(|v| u16::from_str(&v).ok()).unwrap();
+      .and_then(|v| u16::from_str(&v).ok())
+      .unwrap();
 
     if let Some(state) = self.state.as_mut() {
       state.mut_network().set_port(port as i32);
@@ -85,7 +84,7 @@ impl GameServer {
     }
 
     let mut new_state = self.load_snapshot()
-          .unwrap_or(State::new());
+      .unwrap_or(State::new());
     new_state.mut_network().set_port(port as i32);
     self.state = Some(new_state);
   }
@@ -106,7 +105,8 @@ impl GameServer {
    */
   pub fn dump_state(&mut self) -> OpaqueState {
     info!("Unloading runnning game");
-    let running_game = self.running_game.take().expect("Tried to dump state from a non-running game");
+    let running_game =
+      self.running_game.take().expect("Tried to dump state from a non-running game");
     OpaqueState {
       state_bytes: running_game.build_state().write_to_bytes().unwrap(),
       transient_state: running_game.take_transient_state(),
@@ -123,12 +123,14 @@ impl GameServer {
     if self.running_game.is_some() {
       self.running_game.as_mut().unwrap().run();
     } else {
-      let state = self.state.take()
-          .or_else(|| self.load_snapshot())
-          .unwrap_or(State::new());
+      let state = self.state
+        .take()
+        .or_else(|| self.load_snapshot())
+        .unwrap_or(State::new());
 
-      let transient = self.transient.take()
-          .unwrap_or_else(|| GameServer::start_transient(&state));
+      let transient = self.transient
+        .take()
+        .unwrap_or_else(|| GameServer::start_transient(&state));
       let mut running_game = RunningGame::new(state, transient);
       info!("Started game");
       running_game.run();
@@ -163,20 +165,21 @@ impl GameServer {
    */
   fn try_save_snapshot(&self) {
     if self.ticks % 1000 != 0 || self.running_game.is_none() {
-      return
+      return;
     }
 
     let mut snapshot_file = env::temp_dir();
     snapshot_file.push("space_coop-server.snapshot");
 
-    match (File::create(snapshot_file.clone()).ok(), self.running_game.as_ref().unwrap().build_state().write_to_bytes().ok()) {
+    match (File::create(snapshot_file.clone()).ok(),
+           self.running_game.as_ref().unwrap().build_state().write_to_bytes().ok()) {
       (Some(mut file), Some(bytes)) => {
         file.write_all(&bytes);
         trace!("Wrote snap to {:?}", snapshot_file);
       },
       _ => {
         trace!("Failed to write snap to {:?}", snapshot_file);
-      }
+      },
     }
   }
 
