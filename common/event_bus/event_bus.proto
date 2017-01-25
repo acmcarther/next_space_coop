@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package common.event_bus;
+
+// A view into a full event bus
+message Snapshot {
+  // The set of bus event frames that this snapshot contains
+  repeated Frame frames = 1;
+  // Offset from "zero" that this snapshot starts at
+  optional int64 starting_index = 2;
+}
+
+// An index into the event bus for resuming reads between frames
+message Index {
+  optional int64 frame_index = 1;
+  optional int64 event_index = 2;
+}
+
+// All of the event for a single frame
+message Frame {
+  repeated Event events = 1;
+}
+
+// A single event from the event bus
+message Event {
+  optional string path = 1;
+  optional string origin = 2;
+  optional bytes payload = 3;
+}
