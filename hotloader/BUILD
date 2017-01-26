@@ -2,16 +2,15 @@ package(default_visibility = ["//visibility:public"])
 
 load(
     "@io_bazel_rules_rust//rust:rust.bzl",
-    "rust_binary",
+    "rust_library",
 )
 
-rust_binary(
-    name = "launcher",
+rust_library(
+    name = "hotloader",
     srcs = [
-        "src/main.rs",
+        "src/lib.rs",
     ],
     deps = [
-      "//client_server/server/launcher",
       "//third_party/cargo2bazel/clap",
       "//third_party/rust/hotload",
     ],
