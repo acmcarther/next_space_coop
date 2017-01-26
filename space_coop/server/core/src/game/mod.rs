@@ -95,7 +95,7 @@ impl GameServer {
    * This function has no effect if the game is already running.
    */
   pub fn initialize(&mut self, opaque_state: Box<OpaqueState>) {
-    info!("Hotloading");
+    info!("Hotloading...");
     self.state = Some(protobuf::parse_from_bytes(&opaque_state.state_bytes).unwrap());
     self.transient = Some(opaque_state.transient_state);
   }
@@ -104,7 +104,7 @@ impl GameServer {
    * Unloads a running game, extracting the persistent and transient state.
    */
   pub fn dump_state(&mut self) -> OpaqueState {
-    info!("Unloading runnning game");
+    info!("Unloading running game");
     let running_game =
       self.running_game.take().expect("Tried to dump state from a non-running game");
     OpaqueState {

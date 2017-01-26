@@ -1,4 +1,6 @@
 extern crate state_proto;
+extern crate service_proto;
+extern crate player_proto;
 extern crate service;
 extern crate libc;
 extern crate clap;
@@ -6,6 +8,7 @@ extern crate protobuf;
 extern crate gaffer_udp;
 extern crate fern;
 extern crate time;
+extern crate itertools;
 
 #[macro_use]
 extern crate lazy_static;
@@ -42,7 +45,7 @@ lazy_static! {
             format!("[{}][{}] {}", time::now().strftime("%Y-%m-%d][%H:%M:%S").unwrap(), level, msg)
         }),
         output: vec![fern::OutputConfig::stdout(), fern::OutputConfig::file("logs/server.log")],
-        level: log::LogLevelFilter::Info,
+        level: log::LogLevelFilter::Trace,
     };
 
     fern::init_global_logger(logger_config, log::LogLevelFilter::Trace)
