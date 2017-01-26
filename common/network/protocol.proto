@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package common.network;
+
+message Packet {
+  enum MessageType {
+    KEEP_ALIVE = 0;
+    DATAGRAM = 1;
+  }
+
+  optional MessageType message_type = 1;
+  optional bytes payload = 2;
+}

@@ -21,7 +21,9 @@ rust_library(
     deps = [
         ":player_proto",
         "@protoc_gen_rust//:protobuf",
+        "//space_coop/common:network_proto",
         "//common/state:state_proto",
+        "//common/network:protocol_proto",
         "//common/service",
         "//common/service:service_proto",
         "//third_party/cargo2bazel/log",

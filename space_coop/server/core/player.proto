@@ -3,8 +3,8 @@ syntax = "proto2";
 package space_coop.server.core;
 
 message NetworkPlayer {
-  optional string player_key = 1;
-  optional string player_ip = 2;
+  optional string key = 1;
+  optional string ip = 2;
   optional bool connected = 3;
 }
 

@@ -3,6 +3,12 @@ use state_proto::state::NetworkConfig;
 use state_proto::state::State;
 use state_proto::state::Time;
 use state_proto::state::Time_TimeMode;
+use protocol_proto::protocol::Packet;
+use protocol_proto::protocol::Packet_MessageType;
+use network_proto::network::ClientMessage;
+use network_proto::network::ClientMessage_MessageType;
+use network_proto::network::ServerMessage;
+use network_proto::network::ServerMessage_MessageType;
 use service_proto::service::Resource;
 use player_proto::player::NetworkPlayer;
 use player_proto::player::PlayerData;
@@ -13,12 +19,41 @@ use super::TransientState;
 use time::PreciseTime;
 use itertools::Itertools;
 use std::collections::HashMap;
+use std::net::SocketAddr;
+use std::str::FromStr;
+use gaffer_udp::packet::GafferPacket;
 
 pub struct RunningGame {
   state: State,
   players: PlayerData,
   transient: TransientState,
   last_run_time: PreciseTime,
+}
+
+fn keep_alive_packet() -> Vec<u8> {
+  let mut packet = Packet::new();
+  packet.set_message_type(Packet_MessageType::KEEP_ALIVE);
+  packet.write_to_bytes().expect("couldn't convert packet to bytes")
+}
+
+fn connected_packet() -> Vec<u8> {
+  let mut packet = Packet::new();
+  packet.set_message_type(Packet_MessageType::DATAGRAM);
+  let mut msg = ServerMessage::new();
+  msg.set_message_type(ServerMessage_MessageType::CONNECTED);
+  packet.set_payload(msg.write_to_bytes().expect("Couldnt convert message to bytes"));
+
+  packet.write_to_bytes().expect("couldn't convert packet to bytes")
+}
+
+fn disconnected_packet() -> Vec<u8> {
+  let mut packet = Packet::new();
+  packet.set_message_type(Packet_MessageType::DATAGRAM);
+  let mut msg = ServerMessage::new();
+  msg.set_message_type(ServerMessage_MessageType::DISCONNECTED);
+  packet.set_payload(msg.write_to_bytes().expect("Couldnt convert message to bytes"));
+
+  packet.write_to_bytes().expect("couldn't convert packet to bytes")
 }
 
 fn resource_list_into_map(mut resources: RepeatedField<Resource>) -> HashMap<String, Resource>{
@@ -85,6 +120,8 @@ impl RunningGame {
       .expect("time between runs was way too long (over 280k years!)");
     let next_timestamp = self.state.get_time().get_timestamp().clone() + microsecond_delta;
     self.state.mut_time().set_timestamp(next_timestamp);
+
+    self.update_network_state();
   }
 
   pub fn build_state(&self) -> State {
@@ -98,5 +135,61 @@ impl RunningGame {
 
   pub fn take_transient_state(self) -> TransientState {
     self.transient
+  }
+
+  fn update_network_state(&mut self) {
+    let mut ip_to_player_idx: HashMap<String, usize> = HashMap::new();
+    self.players.get_players().iter()
+      .enumerate()
+      .foreach(|(idx, player)| {
+        ip_to_player_idx.insert(player.get_ip().to_owned(), idx);
+      });
+
+    let mut outgoing_msgs = Vec::new();
+
+    while let Ok(Some(pkt)) = self.transient.network.socket.recv() {
+      let addr_str = pkt.addr.to_string();
+      let idx_opt = ip_to_player_idx.get(&addr_str).cloned();
+
+      let idx = if idx_opt.is_none() {
+        let map_size = ip_to_player_idx.len();
+        ip_to_player_idx.insert(addr_str.clone(), map_size);
+        map_size
+      } else {
+        idx_opt.unwrap().clone()
+      };
+
+
+      let player = self.players.mut_players().get_mut(idx).unwrap();
+
+      let message_opt = protobuf::parse_from_bytes::<Packet>(&pkt.payload).ok();
+      if message_opt.is_some() {
+        let message = message_opt.unwrap();
+        match message.get_message_type() {
+          Packet_MessageType::DATAGRAM => {
+            let payload_bytes = message.get_payload();
+            let msg_opt = protobuf::parse_from_bytes::<ClientMessage>(&pkt.payload).ok();
+            if let Some(msg) = msg_opt {
+              match msg.get_message_type() {
+                ClientMessage_MessageType::CONNECT => {
+                  player.set_connected(true);
+                  outgoing_msgs.push(GafferPacket::new(SocketAddr::from_str(&addr_str).unwrap(), connected_packet()))
+                },
+                ClientMessage_MessageType::DISCONNECT => {
+                  player.set_connected(false);
+                  outgoing_msgs.push(GafferPacket::new(SocketAddr::from_str(&addr_str).unwrap(), disconnected_packet()))
+                },
+                _ => {}
+              }
+            }
+          }
+          _ => {}
+        }
+
+      }
+      outgoing_msgs.push(GafferPacket::new(SocketAddr::from_str(&addr_str).unwrap(), keep_alive_packet()))
+    }
+
+    outgoing_msgs.into_iter().foreach(|msg| {self.transient.network.socket.send(msg);});
   }
 }

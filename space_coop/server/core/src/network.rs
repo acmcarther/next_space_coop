@@ -1,7 +1,7 @@
 use gaffer_udp::non_blocking::GafferSocket;
 
 pub struct Network {
-  socket: GafferSocket,
+  pub socket: GafferSocket,
 }
 
 

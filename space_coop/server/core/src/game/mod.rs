@@ -35,7 +35,7 @@ pub struct OpaqueState {
  * WARNING: CHANGING THIS CLASS WHILE HOTLOADING CAN LEAD TO UNDEFINED BEHAVIOR
  */
 pub struct TransientState {
-  network: Network,
+  pub network: Network,
 }
 
 impl TransientState {

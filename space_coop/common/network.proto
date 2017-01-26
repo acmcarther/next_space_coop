@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package space_coop.common.network;
+
+message ClientMessage {
+  enum MessageType {
+    KEEP_ALIVE = 0;
+    CONNECT = 1;
+    DISCONNECT = 2;
+  }
+
+  optional MessageType message_type = 1;
+}
+
+message ServerMessage {
+  enum MessageType {
+    KEEP_ALIVE = 0;
+    CONNECTED = 1;
+    DISCONNECTED = 2;
+  }
+
+  optional MessageType message_type = 1;
+}

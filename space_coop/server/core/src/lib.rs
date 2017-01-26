@@ -1,6 +1,8 @@
 extern crate state_proto;
 extern crate service_proto;
 extern crate player_proto;
+extern crate protocol_proto;
+extern crate network_proto;
 extern crate service;
 extern crate libc;
 extern crate clap;
