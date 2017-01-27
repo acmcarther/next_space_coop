@@ -1,3 +1,6 @@
+logs
+====
 This is where logs get dumped by applications.
 
-This file exists so that the folder gets committed.
+Fun note: This file is in source control because `fern` doesn't like making it.
+
