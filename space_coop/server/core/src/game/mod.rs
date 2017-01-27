@@ -12,6 +12,8 @@ use state_proto::state::Time;
 use state_proto::state::Time_TimeMode;
 use std::env;
 use std::fs;
+use std::path::PathBuf;
+use std::marker::PhantomData;
 use std::fs::File;
 use std::io;
 use std::io::Write;
@@ -54,15 +56,20 @@ pub struct GameServer {
   transient: Option<TransientState>,
   running_game: Option<RunningGame>,
   ticks: u64,
+  snapshotter: Snapshotter<State>,
 }
 
 impl GameServer {
   pub fn new() -> GameServer {
+    let mut snap_path = env::temp_dir();
+    snap_path.push("space_coop-server.snapshot");
+
     let mut server = GameServer {
       state: None,
       transient: None,
       running_game: None,
       ticks: 0,
+      snapshotter: Snapshotter::new(1000 /* rate */, snap_path),
     };
     server
   }
@@ -83,7 +90,7 @@ impl GameServer {
       return;
     }
 
-    let mut new_state = self.load_snapshot()
+    let mut new_state = self.snapshotter.load()
       .unwrap_or(State::new());
     new_state.mut_network().set_port(port as i32);
     self.state = Some(new_state);
@@ -125,7 +132,7 @@ impl GameServer {
     } else {
       let state = self.state
         .take()
-        .or_else(|| self.load_snapshot())
+        .or_else(|| self.snapshotter.load())
         .unwrap_or(State::new());
 
       let transient = self.transient
@@ -136,17 +143,53 @@ impl GameServer {
       running_game.run();
       self.running_game = Some(running_game);
     }
-    self.try_save_snapshot();
+    let game = &self.running_game;
+    self.snapshotter.snap(|| {game.as_ref().unwrap().build_state()})
   }
 
-  /**
-   * A helper function that loads persistent state from a state snapshot, if one is available.
-   */
-  fn load_snapshot(&self) -> Option<State> {
-    let mut snapshot_file = env::temp_dir();
-    snapshot_file.push("space_coop-server.snapshot");
+  pub fn start_transient(state: &State) -> TransientState {
+    info!("Initializing transient state objects");
+    let network = Network::new(state.get_network().get_port() as u16);
+    TransientState::new(network)
+  }
+}
 
-    let state: Option<State> = File::open(snapshot_file)
+pub struct Snapshotter<S: ::protobuf::MessageStatic> {
+  rate: u32,
+  path: PathBuf,
+  call_counter: u32,
+  _msg: PhantomData<S>
+}
+
+impl<S: ::protobuf::MessageStatic> Snapshotter<S> {
+  fn new(rate: u32, path: PathBuf) -> Snapshotter<S> {
+    Snapshotter {
+      rate: rate,
+      path: path,
+      call_counter: 0,
+      _msg: PhantomData
+    }
+  }
+
+  fn snap<F: Fn() -> S>(&mut self, state_generator: F) {
+    if self.call_counter % self.rate == 0 {
+      match (File::create(&self.path).ok(),
+             state_generator().write_to_bytes().ok()) {
+        (Some(mut file), Some(bytes)) => {
+          file.write_all(&bytes);
+          trace!("Wrote snap to {:?}", &self.path);
+        },
+        _ => {
+          trace!("Failed to write snap to {:?}", &self.path);
+        },
+      }
+    }
+
+    self.call_counter = self.call_counter.wrapping_add(1);
+  }
+
+  fn load(&self) -> Option<S> {
+    let state: Option<S> = File::open(&self.path)
       .ok()
       .and_then(|mut f| protobuf::parse_from_reader(&mut f).ok());
 
@@ -157,35 +200,5 @@ impl GameServer {
     }
 
     state
-  }
-
-  /**
-   * A helper function that uses a running game to build and save a persistent state snapshot,
-   * with a frequency according to its own internal clock.
-   */
-  fn try_save_snapshot(&self) {
-    if self.ticks % 1000 != 0 || self.running_game.is_none() {
-      return;
-    }
-
-    let mut snapshot_file = env::temp_dir();
-    snapshot_file.push("space_coop-server.snapshot");
-
-    match (File::create(snapshot_file.clone()).ok(),
-           self.running_game.as_ref().unwrap().build_state().write_to_bytes().ok()) {
-      (Some(mut file), Some(bytes)) => {
-        file.write_all(&bytes);
-        trace!("Wrote snap to {:?}", snapshot_file);
-      },
-      _ => {
-        trace!("Failed to write snap to {:?}", snapshot_file);
-      },
-    }
-  }
-
-  pub fn start_transient(state: &State) -> TransientState {
-    info!("Initializing transient state objects");
-    let network = Network::new(state.get_network().get_port() as u16);
-    TransientState::new(network)
   }
 }
