@@ -1,8 +1,5 @@
+use clap::ArgMatches;
 use ::network::Network;
-use state_proto::state::NetworkConfig;
-use state_proto::state::State;
-use state_proto::state::Time;
-use state_proto::state::Time_TimeMode;
 use protocol_proto::protocol::Packet;
 use protocol_proto::protocol::Packet_MessageType;
 use network_proto::network::ClientMessage;
@@ -10,12 +7,10 @@ use network_proto::network::ClientMessage_MessageType;
 use network_proto::network::ServerMessage;
 use network_proto::network::ServerMessage_MessageType;
 use service_proto::service::Resource;
-use player_proto::player::NetworkPlayer;
 use player_proto::player::PlayerData;
 use protobuf;
 use protobuf::Message;
 use protobuf::RepeatedField;
-use super::TransientState;
 use time::PreciseTime;
 use itertools::Itertools;
 use std::collections::HashMap;
@@ -23,10 +18,25 @@ use std::net::SocketAddr;
 use std::str::FromStr;
 use gaffer_udp::packet::GafferPacket;
 
+/**
+ * The exported type that is passed unmodified between loads
+ *
+ * WARNING: CHANGING THE SIGNATURE OF THIS TYPE MAY BREAK HOTLOADS.
+ */
+pub type Transient = Network;
+
+/**
+ * The exported type that is serialized and deserialized
+ *
+ * Changing the signature of this is safe, provided it has a flexible serialization format, such as
+ * protobuf.
+ */
+pub use state_proto::state::State;
+
 pub struct RunningGame {
   state: State,
   players: PlayerData,
-  transient: TransientState,
+  network: Network,
   last_run_time: PreciseTime,
 }
 
@@ -56,7 +66,7 @@ fn disconnected_packet() -> Vec<u8> {
   packet.write_to_bytes().expect("couldn't convert packet to bytes")
 }
 
-fn resource_list_into_map(mut resources: RepeatedField<Resource>) -> HashMap<String, Resource>{
+fn resource_list_into_map(resources: RepeatedField<Resource>) -> HashMap<String, Resource>{
   let mut result = HashMap::new();
 
   resources.into_iter()
@@ -79,7 +89,7 @@ fn resource_list_into_map(mut resources: RepeatedField<Resource>) -> HashMap<Str
   result
 }
 
-fn try_parse_player_resource(mut resource: Option<Resource>) -> PlayerData {
+fn try_parse_player_resource(resource: Option<Resource>) -> PlayerData {
   if resource.is_none() {
     info!("Player resource data not present, building fresh");
     return PlayerData::new();
@@ -97,15 +107,31 @@ fn try_parse_player_resource(mut resource: Option<Resource>) -> PlayerData {
 }
 
 impl RunningGame {
-  pub fn new(mut state: State, transient: TransientState) -> RunningGame {
+  pub fn fresh(flags: ArgMatches) -> RunningGame {
+    RunningGame::from_snapshot(State::new(), flags)
+  }
+
+  pub fn from_snapshot(state: State, flags: ArgMatches) -> RunningGame {
+    let port = flags
+      .value_of("port")
+      .and_then(|v| u16::from_str(&v).ok())
+      .unwrap();
+    RunningGame::new(state, Network::new(port))
+  }
+
+  pub fn from_opaque(state: State, network: Network) -> RunningGame {
+    RunningGame::new(state, network)
+  }
+
+  fn new(mut state: State, network: Network) -> RunningGame {
     trace!("Hotloading with: {:?}", state);
     let resources = state.take_resources();
     let mut resource_map = resource_list_into_map(resources);
     let player_resource = try_parse_player_resource(resource_map.remove("players"));
     RunningGame {
       state: state,
-      players: PlayerData::new(),
-      transient: transient,
+      players: player_resource,
+      network: network,
       last_run_time: PreciseTime::now(),
     }
   }
@@ -133,8 +159,8 @@ impl RunningGame {
     state
   }
 
-  pub fn take_transient_state(self) -> TransientState {
-    self.transient
+  pub fn build_transient(self) -> Transient {
+    self.network
   }
 
   fn update_network_state(&mut self) {
@@ -147,7 +173,7 @@ impl RunningGame {
 
     let mut outgoing_msgs = Vec::new();
 
-    while let Ok(Some(pkt)) = self.transient.network.socket.recv() {
+    while let Ok(Some(pkt)) = self.network.socket.recv() {
       let addr_str = pkt.addr.to_string();
       let idx_opt = ip_to_player_idx.get(&addr_str).cloned();
 
@@ -168,7 +194,7 @@ impl RunningGame {
         match message.get_message_type() {
           Packet_MessageType::DATAGRAM => {
             let payload_bytes = message.get_payload();
-            let msg_opt = protobuf::parse_from_bytes::<ClientMessage>(&pkt.payload).ok();
+            let msg_opt = protobuf::parse_from_bytes::<ClientMessage>(payload_bytes).ok();
             if let Some(msg) = msg_opt {
               match msg.get_message_type() {
                 ClientMessage_MessageType::CONNECT => {
@@ -190,6 +216,10 @@ impl RunningGame {
       outgoing_msgs.push(GafferPacket::new(SocketAddr::from_str(&addr_str).unwrap(), keep_alive_packet()))
     }
 
-    outgoing_msgs.into_iter().foreach(|msg| {self.transient.network.socket.send(msg);});
+    outgoing_msgs.into_iter().foreach(|msg| {
+      if self.network.socket.send(msg).is_err() {
+        warn!("Failed to enqueue network message")
+      }
+    });
   }
 }

@@ -1,156 +1,87 @@
 mod running;
 
 
+use libc;
 use clap::ArgMatches;
-use network::Network;
 use protobuf;
-use protobuf::Message;
 use self::running::RunningGame;
-use state_proto::state::NetworkConfig;
-use state_proto::state::State;
-use state_proto::state::Time;
-use state_proto::state::Time_TimeMode;
 use std::env;
-use std::fs;
 use std::path::PathBuf;
 use std::marker::PhantomData;
 use std::fs::File;
-use std::io;
 use std::io::Write;
-use std::str::FromStr;
-use time::PreciseTime;
 
 /**
- * The "opaque pointer" that this dylib's state is cast to.
+ * Wire state that is compatible with past or future versions of the same struct, for different
+ * definitions of State.
  *
- * WARNING: CHANGING THIS CLASS WHILE HOTLOADING CAN LEAD TO UNDEFINED BEHAVIOR
+ * WARNING: CHANGING THE SIGNATURE OF THIS TYPE MAY BREAK HOTLOADS.
  */
-pub struct OpaqueState {
-  pub state_bytes: Vec<u8>,
-  pub transient_state: TransientState,
+pub struct OpaqueState<T> {
+  state_bytes: Vec<u8>,
+  pub transient: T,
 }
 
-/**
- * Per-execution properties that persist while hotloading, but can be dropped between snapshot
- * loads.
- *
- * WARNING: CHANGING THIS CLASS WHILE HOTLOADING CAN LEAD TO UNDEFINED BEHAVIOR
- */
-pub struct TransientState {
-  pub network: Network,
-}
-
-impl TransientState {
-  pub fn new(network: Network) -> TransientState {
-    TransientState { network: network }
+impl<T> OpaqueState<T> {
+  fn new<M: ::protobuf::MessageStatic>(state: M, transient: T) -> OpaqueState<T> {
+    OpaqueState {
+      state_bytes: state.write_to_bytes().expect("proto failed to serialize"),
+      transient: transient
+    }
+  }
+  fn parse_state_bytes<M: ::protobuf::MessageStatic>(&self) -> M {
+    protobuf::parse_from_bytes(&self.state_bytes)
+        .expect("last state proto was not parseable")
   }
 }
 
-/**
- * The whole state of the game system.
- *
- * This struct is safe to change while hotloading
- */
+
+fn new_snapshotter() -> Snapshotter<running::State> {
+  let mut snap_path = env::temp_dir();
+  snap_path.push("space_coop-server.snapshot");
+  Snapshotter::new(1000 /* rate */, snap_path)
+}
+
 pub struct GameServer {
-  state: Option<State>,
-  transient: Option<TransientState>,
-  running_game: Option<RunningGame>,
-  ticks: u64,
-  snapshotter: Snapshotter<State>,
+  game: RunningGame,
+  snapshotter: Snapshotter<running::State>,
 }
 
 impl GameServer {
-  pub fn new() -> GameServer {
-    let mut snap_path = env::temp_dir();
-    snap_path.push("space_coop-server.snapshot");
-
-    let mut server = GameServer {
-      state: None,
-      transient: None,
-      running_game: None,
-      ticks: 0,
-      snapshotter: Snapshotter::new(1000 /* rate */, snap_path),
-    };
-    server
-  }
-
-  /**
-   * Updates the internal state to have the flags passed.
-   *
-   * Will crate a new initial state if one does not exist.
-   * This function has no effect if the game is already running.
-   */
-  pub fn set_flags(&mut self, matches: ArgMatches) {
-    let port = matches.value_of("port")
-      .and_then(|v| u16::from_str(&v).ok())
-      .unwrap();
-
-    if let Some(state) = self.state.as_mut() {
-      state.mut_network().set_port(port as i32);
-      return;
-    }
-
-    let mut new_state = self.snapshotter.load()
-      .unwrap_or(State::new());
-    new_state.mut_network().set_port(port as i32);
-    self.state = Some(new_state);
-  }
-
-  /**
-   * Parses the persistent and transient state from the provided opaque state.
-   *
-   * This function has no effect if the game is already running.
-   */
-  pub fn initialize(&mut self, opaque_state: Box<OpaqueState>) {
-    info!("Hotloading...");
-    self.state = Some(protobuf::parse_from_bytes(&opaque_state.state_bytes).unwrap());
-    self.transient = Some(opaque_state.transient_state);
-  }
-
-  /**
-   * Unloads a running game, extracting the persistent and transient state.
-   */
-  pub fn dump_state(&mut self) -> OpaqueState {
-    info!("Unloading running game");
-    let running_game =
-      self.running_game.take().expect("Tried to dump state from a non-running game");
-    OpaqueState {
-      state_bytes: running_game.build_state().write_to_bytes().unwrap(),
-      transient_state: running_game.take_transient_state(),
-    }
-  }
-
-  /**
-   * Runs an existing RunningGame, if one already exists, or generates a fresh RunningGame, and
-   * runs that.
-   */
-  pub fn run(&mut self) {
-    self.ticks = self.ticks + 1;
-
-    if self.running_game.is_some() {
-      self.running_game.as_mut().unwrap().run();
+  pub fn new(flags: ArgMatches) -> GameServer {
+    let snapshotter = new_snapshotter();
+    let game = if let Some(snapshot) = snapshotter.load() {
+      RunningGame::from_snapshot(snapshot, flags)
     } else {
-      let state = self.state
-        .take()
-        .or_else(|| self.snapshotter.load())
-        .unwrap_or(State::new());
+      RunningGame::fresh(flags)
+    };
 
-      let transient = self.transient
-        .take()
-        .unwrap_or_else(|| GameServer::start_transient(&state));
-      let mut running_game = RunningGame::new(state, transient);
-      info!("Started game");
-      running_game.run();
-      self.running_game = Some(running_game);
+    GameServer {
+      game: game,
+      snapshotter: snapshotter
     }
-    let game = &self.running_game;
-    self.snapshotter.snap(|| {game.as_ref().unwrap().build_state()})
   }
 
-  pub fn start_transient(state: &State) -> TransientState {
-    info!("Initializing transient state objects");
-    let network = Network::new(state.get_network().get_port() as u16);
-    TransientState::new(network)
+  pub fn hotload(opaque_state: *mut libc::c_void) -> GameServer {
+    let opaque_state = unsafe { Box::from_raw(opaque_state as *mut OpaqueState<running::Transient>) };
+    GameServer {
+      game: RunningGame::from_opaque(
+        opaque_state.parse_state_bytes(),
+        opaque_state.transient),
+      snapshotter: new_snapshotter()
+    }
+  }
+
+  pub fn dump_state(self) -> *mut libc::c_void {
+    Box::into_raw(Box::new(OpaqueState::new(
+      self.game.build_state(),
+      self.game.build_transient()))) as *mut libc::c_void
+  }
+
+  pub fn run(&mut self) {
+    self.game.run();
+    let borrowed_game = &self.game;
+    self.snapshotter.snap(|| borrowed_game.build_state())
   }
 }
 
@@ -176,8 +107,11 @@ impl<S: ::protobuf::MessageStatic> Snapshotter<S> {
       match (File::create(&self.path).ok(),
              state_generator().write_to_bytes().ok()) {
         (Some(mut file), Some(bytes)) => {
-          file.write_all(&bytes);
-          trace!("Wrote snap to {:?}", &self.path);
+          if file.write_all(&bytes).is_ok() {
+            trace!("Wrote snap to {:?}", &self.path);
+          } else {
+            warn!("Failed to write snap to {:?}", &self.path);
+          }
         },
         _ => {
           trace!("Failed to write snap to {:?}", &self.path);

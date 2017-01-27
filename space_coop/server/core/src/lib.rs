@@ -21,25 +21,11 @@ extern crate log;
 mod game;
 mod network;
 
-
-pub use ffi::*;
-
 use game::GameServer;
-use service::Service;
-use state_proto::state::NetworkConfig;
-use state_proto::state::State;
-use state_proto::state::Time;
-use state_proto::state::Time_TimeMode;
-use std::io;
-use std::io::Write;
-use std::mem;
-
-use std::ptr;
-
 use std::sync::Mutex;
 
 lazy_static! {
-  static ref GAME_STATE: Mutex<GameServer> = {
+  static ref GAME_STATE: Mutex<Option<GameServer>> = {
     let logger_config = fern::DispatchConfig {
         format: Box::new(|msg: &str, level: &log::LogLevel, _location: &log::LogLocation| {
             // This is a fairly simple format, though it's possible to do more complicated ones.
@@ -52,44 +38,43 @@ lazy_static! {
 
     fern::init_global_logger(logger_config, log::LogLevelFilter::Trace)
       .expect("could not load logger");
-    Mutex::new(GameServer::new())
+    Mutex::new(None)
   };
 }
 
+pub use ffi::*;
 mod ffi {
   use ::clap::ArgMatches;
-  use game::OpaqueState;
+  use game::GameServer;
   use ::libc;
-  use ::protobuf;
-  use ::protobuf::Message;
-  use state_proto::state::State;
-  use std::io;
-  use std::io::Write;
-  use std::mem;
-  use std::str::FromStr;
   use super::GAME_STATE;
 
   #[no_mangle]
-  pub fn set_flags(matches: ArgMatches) {
-    GAME_STATE.lock().unwrap().set_flags(matches);
-    info!("Set flags for dylib");
+  pub fn new(matches: ArgMatches) {
+    let mut state = GAME_STATE.lock().unwrap();
+    *state = Some(GameServer::new(matches));
   }
 
   #[no_mangle]
-  pub fn initialize(state: *mut libc::c_void) {
-    let mut opaque_state = unsafe { Box::from_raw(state as *mut OpaqueState) };
-    GAME_STATE.lock().unwrap().initialize(opaque_state);
+  pub fn hotload(opaque_state: *mut libc::c_void) {
+    let mut state = GAME_STATE.lock().unwrap();
+    *state = Some(GameServer::hotload(opaque_state));
   }
 
   #[no_mangle]
   pub fn run() {
-    GAME_STATE.lock().unwrap().run();
+    let mut state = GAME_STATE.lock().unwrap();
+    state.as_mut()
+      .expect("must call new or hotload before run")
+      .run()
   }
 
   #[no_mangle]
   pub fn dump_state() -> *mut libc::c_void {
-    let opaque_state = GAME_STATE.lock().unwrap().dump_state();
-    Box::into_raw(Box::new(opaque_state)) as *mut libc::c_void
+    let mut state = GAME_STATE.lock().unwrap();
+    state.take()
+      .expect("must call new or hotload before dump_state")
+      .dump_state()
   }
 
 }
