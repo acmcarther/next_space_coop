@@ -11,7 +11,6 @@ rust_binary(
         "src/main.rs",
     ],
     deps = [
-      "//client_server/server/launcher",
       "//third_party/cargo2bazel/clap",
       "//third_party/rust/hotload",
     ],
