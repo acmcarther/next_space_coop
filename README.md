@@ -1,7 +1,6 @@
-next space coop
-===============
+# next space coop
 
-# Setup
+## Setup
 Make sure you have a (recent) installation of bazel.
 
 ## Working on next_space_coop
