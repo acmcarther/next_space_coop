@@ -21,11 +21,14 @@ extern crate log;
 mod game;
 mod network;
 
-use game::GameServer;
+use game::SnapshottedGame;
+use game::running::State;
+use game::running::Transient;
+use game::running::RunningGame;
 use std::sync::Mutex;
 
 lazy_static! {
-  static ref GAME_STATE: Mutex<Option<GameServer>> = {
+  static ref GAME_STATE: Mutex<Option<SnapshottedGame<State, Transient, RunningGame>>> = {
     let logger_config = fern::DispatchConfig {
         format: Box::new(|msg: &str, level: &log::LogLevel, _location: &log::LogLocation| {
             // This is a fairly simple format, though it's possible to do more complicated ones.
@@ -44,21 +47,23 @@ lazy_static! {
 
 pub use ffi::*;
 mod ffi {
-  use ::clap::ArgMatches;
-  use game::GameServer;
-  use ::libc;
+  use clap::ArgMatches;
+  use game::SnapshottedGame;
+  use libc;
   use super::GAME_STATE;
+
+  static APP_NAME: &'static str = "spacecoop-server";
 
   #[no_mangle]
   pub fn new(matches: ArgMatches) {
     let mut state = GAME_STATE.lock().unwrap();
-    *state = Some(GameServer::new(matches));
+    *state = Some(SnapshottedGame::new(APP_NAME, matches));
   }
 
   #[no_mangle]
   pub fn hotload(opaque_state: *mut libc::c_void) {
     let mut state = GAME_STATE.lock().unwrap();
-    *state = Some(GameServer::hotload(opaque_state));
+    *state = Some(SnapshottedGame::hotload(APP_NAME, opaque_state));
   }
 
   #[no_mangle]

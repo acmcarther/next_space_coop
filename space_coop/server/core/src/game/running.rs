@@ -107,22 +107,6 @@ fn try_parse_player_resource(resource: Option<Resource>) -> PlayerData {
 }
 
 impl RunningGame {
-  pub fn fresh(flags: ArgMatches) -> RunningGame {
-    RunningGame::from_snapshot(State::new(), flags)
-  }
-
-  pub fn from_snapshot(state: State, flags: ArgMatches) -> RunningGame {
-    let port = flags
-      .value_of("port")
-      .and_then(|v| u16::from_str(&v).ok())
-      .unwrap();
-    RunningGame::new(state, Network::new(port))
-  }
-
-  pub fn from_opaque(state: State, network: Network) -> RunningGame {
-    RunningGame::new(state, network)
-  }
-
   fn new(mut state: State, network: Network) -> RunningGame {
     trace!("Hotloading with: {:?}", state);
     let resources = state.take_resources();
@@ -134,33 +118,6 @@ impl RunningGame {
       network: network,
       last_run_time: PreciseTime::now(),
     }
-  }
-
-  pub fn run(&mut self) {
-    let now = PreciseTime::now();
-
-    let delta = self.last_run_time.to(now.clone());
-
-    self.last_run_time = now;
-    let microsecond_delta = delta.num_microseconds()
-      .expect("time between runs was way too long (over 280k years!)");
-    let next_timestamp = self.state.get_time().get_timestamp().clone() + microsecond_delta;
-    self.state.mut_time().set_timestamp(next_timestamp);
-
-    self.update_network_state();
-  }
-
-  pub fn build_state(&self) -> State {
-    let mut state = self.state.clone();
-    let mut player_resource = Resource::new();
-    player_resource.set_name("players".to_owned());
-    player_resource.set_data(self.players.write_to_bytes().expect("Couldn't write players proto"));
-    state.mut_resources().push(player_resource);
-    state
-  }
-
-  pub fn build_transient(self) -> Transient {
-    self.network
   }
 
   fn update_network_state(&mut self) {
@@ -221,5 +178,51 @@ impl RunningGame {
         warn!("Failed to enqueue network message")
       }
     });
+  }
+}
+
+
+impl ::game::Game<State, Transient> for RunningGame {
+  fn fresh(flags: ArgMatches) -> RunningGame {
+    RunningGame::from_snapshot(State::new(), flags)
+  }
+
+  fn from_snapshot(state: State, flags: ArgMatches) -> RunningGame {
+    let port = flags
+      .value_of("port")
+      .and_then(|v| u16::from_str(&v).ok())
+      .unwrap();
+    RunningGame::new(state, Network::new(port))
+  }
+
+  fn from_opaque(state: State, network: Network) -> RunningGame {
+    RunningGame::new(state, network)
+  }
+
+  fn run(&mut self) {
+    let now = PreciseTime::now();
+
+    let delta = self.last_run_time.to(now.clone());
+
+    self.last_run_time = now;
+    let microsecond_delta = delta.num_microseconds()
+      .expect("time between runs was way too long (over 280k years!)");
+    let next_timestamp = self.state.get_time().get_timestamp().clone() + microsecond_delta;
+    self.state.mut_time().set_timestamp(next_timestamp);
+
+    self.update_network_state();
+  }
+
+  fn build_state(&self) -> State {
+    let mut state = self.state.clone();
+    let mut player_resource = Resource::new();
+    player_resource.set_name("players".to_owned());
+    player_resource.set_data(self.players.write_to_bytes().expect("Couldn't write players proto"));
+    state.mut_resources().push(player_resource);
+    state
+  }
+
+  fn build_transient(self) -> Transient {
+    self.network
   }
 }

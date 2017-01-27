@@ -1,10 +1,8 @@
-mod running;
-
+pub mod running;
 
 use libc;
 use clap::ArgMatches;
 use protobuf;
-use self::running::RunningGame;
 use std::env;
 use std::path::PathBuf;
 use std::marker::PhantomData;
@@ -36,39 +34,51 @@ impl<T> OpaqueState<T> {
 }
 
 
-fn new_snapshotter() -> Snapshotter<running::State> {
+fn new_snapshotter<S: ::protobuf::MessageStatic>(name: &str) -> Snapshotter<S> {
   let mut snap_path = env::temp_dir();
-  snap_path.push("space_coop-server.snapshot");
+  snap_path.push(format!("{}.snapshot", name));
   Snapshotter::new(1000 /* rate */, snap_path)
 }
 
-pub struct GameServer {
-  game: RunningGame,
-  snapshotter: Snapshotter<running::State>,
+pub struct SnapshottedGame<S: ::protobuf::MessageStatic, T, G: Game<S, T>> {
+  game: G,
+  snapshotter: Snapshotter<S>,
+  _t: PhantomData<T>,
 }
 
-impl GameServer {
-  pub fn new(flags: ArgMatches) -> GameServer {
-    let snapshotter = new_snapshotter();
+pub trait Game<S, T> {
+  fn fresh(flags: ArgMatches) -> Self;
+  fn from_snapshot(state: S, flags: ArgMatches) -> Self;
+  fn from_opaque(state: S, transient: T) -> Self;
+  fn run(&mut self);
+  fn build_state(&self) -> S;
+  fn build_transient(self) -> T;
+}
+
+impl<S: ::protobuf::MessageStatic, T, G: Game<S, T>> SnapshottedGame<S, T, G> {
+  pub fn new(name: &str, flags: ArgMatches) -> SnapshottedGame<S, T, G> {
+    let snapshotter = new_snapshotter(name);
     let game = if let Some(snapshot) = snapshotter.load() {
-      RunningGame::from_snapshot(snapshot, flags)
+      G::from_snapshot(snapshot, flags)
     } else {
-      RunningGame::fresh(flags)
+      G::fresh(flags)
     };
 
-    GameServer {
+    SnapshottedGame {
       game: game,
-      snapshotter: snapshotter
+      snapshotter: snapshotter,
+      _t: PhantomData
     }
   }
 
-  pub fn hotload(opaque_state: *mut libc::c_void) -> GameServer {
-    let opaque_state = unsafe { Box::from_raw(opaque_state as *mut OpaqueState<running::Transient>) };
-    GameServer {
-      game: RunningGame::from_opaque(
+  pub fn hotload(name: &str, opaque_state: *mut libc::c_void) -> SnapshottedGame<S, T, G> {
+    let opaque_state = unsafe { Box::from_raw(opaque_state as *mut OpaqueState<T>) };
+    SnapshottedGame {
+      game: G::from_opaque(
         opaque_state.parse_state_bytes(),
         opaque_state.transient),
-      snapshotter: new_snapshotter()
+      snapshotter: new_snapshotter(name),
+      _t: PhantomData
     }
   }
 
