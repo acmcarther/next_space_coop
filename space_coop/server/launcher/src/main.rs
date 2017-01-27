@@ -1,11 +1,11 @@
 extern crate clap;
-extern crate hotload;
+extern crate loader;
 
 use clap::App;
 use clap::Arg;
 use clap::ArgMatches;
-use hotload::BasicProxy;
-use hotload::Hotloader;
+use loader::BasicProxy;
+use loader::Hotloader;
 use std::env;
 use std::path::PathBuf;
 use std::thread;

@@ -8,11 +8,11 @@ load(
 licenses(["notice"])
 
 rust_library(
-    name = "hotload",
+    name = "loader",
+    srcs = glob(["lib.rs", "src/**/*.rs"]),
     deps = [
       "//third_party/cargo2bazel/libloading",
       "//third_party/cargo2bazel/libc",
       "//third_party/cargo2bazel/clap",
     ],
-    srcs = glob(["lib.rs", "src/**/*.rs"])
 )

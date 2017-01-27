@@ -9,7 +9,7 @@ use network_proto::network::ServerMessage_MessageType;
 use service_proto::service::Resource;
 use player_proto::player::PlayerData;
 use protobuf;
-use runtime_loaded_game::Game;
+use loadable::Game;
 use protobuf::Message;
 use protobuf::RepeatedField;
 use time::PreciseTime;

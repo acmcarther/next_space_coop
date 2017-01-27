@@ -6,7 +6,7 @@ load(
 )
 
 rust_library(
-    name = "runtime_loaded_game",
+    name = "loadable",
     srcs = glob(["src/**/*.rs"]),
     deps = [
         "@protoc_gen_rust//:protobuf",

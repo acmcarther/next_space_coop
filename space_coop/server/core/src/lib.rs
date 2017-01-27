@@ -12,7 +12,7 @@ extern crate fern;
 extern crate time;
 extern crate itertools;
 #[macro_use]
-extern crate runtime_loaded_game;
+extern crate loadable;
 
 #[macro_use]
 extern crate lazy_static;
@@ -23,7 +23,7 @@ extern crate log;
 mod game;
 mod network;
 
-use runtime_loaded_game::SnapshottedGame;
+use loadable::SnapshottedGame;
 use game::State;
 use game::Transient;
 use game::RunningGame;
