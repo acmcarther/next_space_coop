@@ -18,10 +18,9 @@ use std::fs;
 use std::thread;
 use std::time::Duration;
 
-/** A user defined type that wraps a dynamically loaded library. */
 pub trait HotloadProxy {
-  fn initialize_fresh(lib: Library) -> Self;
-  fn initialize(lib: Library, state: *mut libc::c_void) -> Self;
+  fn new(lib: Library, matches: ArgMatches) -> Self;
+  fn hotload(lib: Library, state: *mut libc::c_void) -> Self;
   fn dump_state(self) -> *mut libc::c_void;
 }
 
@@ -32,29 +31,18 @@ pub struct BasicProxy {
 }
 
 impl BasicProxy {
-  /** Set the state of the internal dylib */
-  fn initialize_internal(&mut self, state: *mut libc::c_void) {
-    unsafe {
-      self.lib.get::<fn(*mut libc::c_void)>("initialize".as_bytes()).unwrap()(state)
-    }
-  }
-
   /** Run the dylib's run function using the cached symbol */
   pub fn run(&mut self) {
     self.run_fn.as_mut().unwrap()();
-  }
-
-  /** Set application flags */
-  pub fn set_flags(&mut self, matches: ArgMatches) {
-    unsafe {
-      self.lib.get::<fn(ArgMatches)>("set_flags".as_bytes()).unwrap()(matches)
-    }
   }
 }
 
 impl HotloadProxy for BasicProxy {
   /** Build a brand new proxy from a library */
-  fn initialize_fresh(lib: Library) -> BasicProxy {
+  fn new(lib: Library, matches: ArgMatches) -> BasicProxy {
+    // Initialize the library
+    unsafe { lib.get::<fn(ArgMatches)>("new".as_bytes()).unwrap()(matches) }
+
     BasicProxy {
       run_fn: Some(unsafe { lib.get::<fn()>("run".as_bytes()).unwrap().into_raw() }),
       lib: lib
@@ -62,10 +50,14 @@ impl HotloadProxy for BasicProxy {
   }
 
   /** Build a brand proxy from a prior opaque state */
-  fn initialize(lib: Library, state: *mut libc::c_void) -> BasicProxy{
-    let mut proxy = BasicProxy::initialize_fresh(lib);
-    proxy.initialize_internal(state);
-    proxy
+  fn hotload(lib: Library, state: *mut libc::c_void) -> BasicProxy {
+    // Hotload the library
+    unsafe { lib.get::<fn(*mut libc::c_void)>("hotload".as_bytes()).unwrap()(state) }
+
+    BasicProxy {
+      run_fn: Some(unsafe { lib.get::<fn()>("run".as_bytes()).unwrap().into_raw() }),
+      lib: lib
+    }
   }
 
   /** Dump the opaque state from the contained dylib */
@@ -87,7 +79,7 @@ pub struct Hotloader<T: HotloadProxy> {
 
 impl <T: HotloadProxy> Hotloader<T> {
   /** Build a fresh hotloader from a path to a dylib */
-  pub fn new(dylib_path: PathBuf) -> Hotloader<T> {
+  pub fn new(dylib_path: PathBuf, matches: ArgMatches) -> Hotloader<T> {
     let mut hotloader = Hotloader {
       proxy: None,
       watched_path: dylib_path,
@@ -95,8 +87,36 @@ impl <T: HotloadProxy> Hotloader<T> {
       last_size: 0,
     };
 
+    hotloader.initialize(matches);
     hotloader.try_hotload();
     hotloader
+  }
+
+  fn initialize(&mut self, matches: ArgMatches) {
+    let (new_size, new_last_modified) = self.lib_metadata().expect("Could not find dylib");
+    let lib = self.load_lib();
+
+    self.proxy = Some(T::new(lib, matches));
+    self.last_modified = new_last_modified;
+    self.last_size = new_size;
+  }
+
+  fn lib_metadata(&self) -> Option<(u64, SystemTime)> {
+    fs::metadata(self.watched_path.clone())
+      .and_then(|v| v.modified().map(|time| (v.size(), time)))
+      .ok()
+  }
+
+  fn load_lib(&self) -> Library {
+    let mut lib = None;
+    while lib.is_none() {
+      lib = Library::new(self.watched_path.clone()).ok();
+      if lib.is_none() {
+        thread::sleep(Duration::from_millis(50));
+      }
+    }
+
+    lib.unwrap()
   }
 
   /** Get the *optional* method proxy. It may not be present if hotloading fails */
@@ -107,32 +127,17 @@ impl <T: HotloadProxy> Hotloader<T> {
 
   /** Attempt a hotload or do nothing */
   fn try_hotload(&mut self) {
-    let (new_size, new_last_modified) = fs::metadata(self.watched_path.clone())
-      .and_then(|v| v.modified().map(|time| (v.size(), time)))
-      .ok()
-      .unwrap_or((self.last_size, self.last_modified));
+    let (new_size, new_last_modified) = self.lib_metadata().unwrap_or((self.last_size, self.last_modified));
     if new_last_modified <= self.last_modified || new_size == 0 {
       return;
     }
 
     // Take state from proxy and drop dylib (so we can reload it)
     // see docs on dlopen for why dropping is necessary
-    let last_state = self.proxy.take().map(|c| c.dump_state());
+    let last_state = self.proxy.take().map(|c| c.dump_state())
+      .expect("tried to hotload an uninitialized library");
 
-    let mut lib = None;
-    while lib.is_none() {
-      lib = Library::new(self.watched_path.clone()).ok();
-      if lib.is_none() {
-        thread::sleep(Duration::from_millis(50));
-      }
-    }
-
-    let new_proxy = match last_state {
-      None => Some(T::initialize_fresh(lib.unwrap())),
-      Some(state) => Some(T::initialize(lib.unwrap(), state))
-    };
-
-    self.proxy = new_proxy;
+    self.proxy = Some(T::hotload(self.load_lib(), last_state));
     self.last_modified = new_last_modified;
     self.last_size = new_size;
   }

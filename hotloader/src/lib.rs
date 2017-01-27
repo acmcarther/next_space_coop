@@ -13,8 +13,7 @@ pub fn run(matches: ArgMatches) {
   let dylib_path = dylib_from(&matches);
   println!("current_dir:{:?}", env::current_dir());
   println!("dylib_path:{:?}", PathBuf::from(dylib_path.clone()));
-  let mut hotloader = Hotloader::<BasicProxy>::new(PathBuf::from(dylib_path));
-  hotloader.get_proxy().unwrap().set_flags(matches);
+  let mut hotloader = Hotloader::<BasicProxy>::new(PathBuf::from(dylib_path), matches);
   loop {
     hotloader.get_proxy().unwrap().run();
     thread::sleep(Duration::from_millis(200));
