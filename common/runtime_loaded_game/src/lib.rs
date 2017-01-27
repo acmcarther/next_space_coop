@@ -1,13 +1,65 @@
-pub mod running;
+extern crate libc;
+extern crate protobuf;
+extern crate clap;
 
-use libc;
+#[macro_use]
+extern crate log;
+
 use clap::ArgMatches;
-use protobuf;
 use std::env;
 use std::path::PathBuf;
 use std::marker::PhantomData;
 use std::fs::File;
 use std::io::Write;
+
+#[macro_export]
+macro_rules! generate_ffi {
+  () => {
+    mod ffi {
+      use ::clap::ArgMatches;
+      use $crate::SnapshottedGame;
+      use ::libc;
+
+      // Must be Mutex<Option<SnapshottedGame<..>>
+      use super::GAME_STATE;
+
+      // Must be &str
+      use super::APP_NAME;
+
+      #[no_mangle]
+      pub fn new(matches: ArgMatches) {
+        let mut state = GAME_STATE.lock().unwrap();
+        *state = Some(SnapshottedGame::new(APP_NAME, matches));
+        info!("Initialized dylib");
+      }
+
+      #[no_mangle]
+      pub fn hotload(opaque_state: *mut libc::c_void) {
+        let mut state = GAME_STATE.lock().unwrap();
+        *state = Some(SnapshottedGame::hotload(APP_NAME, opaque_state));
+        info!("Reloaded dylib");
+      }
+
+      #[no_mangle]
+      pub fn run() {
+        trace!("Running main function");
+        let mut state = GAME_STATE.lock().unwrap();
+        state.as_mut()
+          .expect("must call new or hotload before run")
+          .run()
+      }
+
+      #[no_mangle]
+      pub fn dump_state() -> *mut libc::c_void {
+        info!("Unloading dylib");
+        let mut state = GAME_STATE.lock().unwrap();
+        state.take()
+          .expect("must call new or hotload before dump_state")
+          .dump_state()
+      }
+    }
+  }
+}
 
 /**
  * Wire state that is compatible with past or future versions of the same struct, for different
@@ -95,7 +147,7 @@ impl<S: ::protobuf::MessageStatic, T, G: Game<S, T>> SnapshottedGame<S, T, G> {
   }
 }
 
-pub struct Snapshotter<S: ::protobuf::MessageStatic> {
+struct Snapshotter<S: ::protobuf::MessageStatic> {
   rate: u32,
   path: PathBuf,
   call_counter: u32,
@@ -103,7 +155,7 @@ pub struct Snapshotter<S: ::protobuf::MessageStatic> {
 }
 
 impl<S: ::protobuf::MessageStatic> Snapshotter<S> {
-  fn new(rate: u32, path: PathBuf) -> Snapshotter<S> {
+  pub fn new(rate: u32, path: PathBuf) -> Snapshotter<S> {
     Snapshotter {
       rate: rate,
       path: path,
@@ -112,7 +164,7 @@ impl<S: ::protobuf::MessageStatic> Snapshotter<S> {
     }
   }
 
-  fn snap<F: Fn() -> S>(&mut self, state_generator: F) {
+  pub fn snap<F: Fn() -> S>(&mut self, state_generator: F) {
     if self.call_counter % self.rate == 0 {
       match (File::create(&self.path).ok(),
              state_generator().write_to_bytes().ok()) {
@@ -132,7 +184,7 @@ impl<S: ::protobuf::MessageStatic> Snapshotter<S> {
     self.call_counter = self.call_counter.wrapping_add(1);
   }
 
-  fn load(&self) -> Option<S> {
+  pub fn load(&self) -> Option<S> {
     let state: Option<S> = File::open(&self.path)
       .ok()
       .and_then(|mut f| protobuf::parse_from_reader(&mut f).ok());

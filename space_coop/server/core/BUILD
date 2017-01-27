@@ -22,6 +22,7 @@ rust_library(
         ":player_proto",
         "@protoc_gen_rust//:protobuf",
         "//space_coop/common:network_proto",
+        "//common/runtime_loaded_game",
         "//common/state:state_proto",
         "//common/network:protocol_proto",
         "//common/service",

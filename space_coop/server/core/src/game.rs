@@ -9,6 +9,7 @@ use network_proto::network::ServerMessage_MessageType;
 use service_proto::service::Resource;
 use player_proto::player::PlayerData;
 use protobuf;
+use runtime_loaded_game::Game;
 use protobuf::Message;
 use protobuf::RepeatedField;
 use time::PreciseTime;
@@ -28,8 +29,7 @@ pub type Transient = Network;
 /**
  * The exported type that is serialized and deserialized
  *
- * Changing the signature of this is safe, provided it has a flexible serialization format, such as
- * protobuf.
+ * Changing the definition of this is safe, since it is serialized and deserialized
  */
 pub use state_proto::state::State;
 
@@ -182,7 +182,7 @@ impl RunningGame {
 }
 
 
-impl ::game::Game<State, Transient> for RunningGame {
+impl Game<State, Transient> for RunningGame {
   fn fresh(flags: ArgMatches) -> RunningGame {
     RunningGame::from_snapshot(State::new(), flags)
   }
