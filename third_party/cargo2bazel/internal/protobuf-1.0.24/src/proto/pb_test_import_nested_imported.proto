@@ -1,8 +1,0 @@
-message ContainerForNested {
-    message NestedMessage {
-    }
-
-    enum NestedEnum {
-        RED = 1;
-    }
-}

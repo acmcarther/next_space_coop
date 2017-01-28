@@ -14,7 +14,7 @@ load("@io_bazel_rules_rust//rust:rust.bzl", "rust_repositories")
 git_repository(
     name = "io_bazel_cargo2bazel",
     remote = "https://github.com/acmcarther/cargo2bazel.git",
-    commit = "370ab40"
+    commit = "a28580b"
 )
 
 new_git_repository(

@@ -1,11 +1,11 @@
 # This is a direct dependency
 # You've come to the right place!
+
 package(default_visibility = ["//visibility:public"])
 
 # TODO: we don't actually know this
 licenses(["notice"])
-
 alias(
-  name = "time",
-  actual = "//third_party/cargo2bazel/internal/time-0.1.36:time",
+    name = "time",
+    actual = "//third_party/cargo2bazel/internal/time-0.1.36/default-11648069979105038:time",
 )

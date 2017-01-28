@@ -1,32 +1,12 @@
-# This is (probably) a transitive dependency
-# You likely want "//third_party/cargo2bazel/num_iter"
-#
-# If your package is not available there, you must require it explicitly in Cargo.toml and rerun
-# cargo2bazel
+# This just globs the rust sources so that they can be accessed by inner dirs
 package(default_visibility = [
   "//third_party/cargo2bazel:__subpackages__",
 ])
 
-load(
-    "@io_bazel_rules_rust//rust:rust.bzl",
-    "rust_library",
-    "rust_binary",
-    "rust_test",
-    "rust_doc",
-    "rust_doc_test",
-)
-
 # TODO: we don't actually know this
 licenses(["notice"])
 
-rust_library(
-    name = "num_iter",
-    deps = [
-      "//third_party/cargo2bazel/internal/num-integer-0.1.32:num_integer",
-    "//third_party/cargo2bazel/internal/num-traits-0.1.36:num_traits"
-    ],
+filegroup(
+    name = "sources",
     srcs = glob(["lib.rs", "src/**/*.rs"]),
-    rustc_flags = [
-      "--cap-lints warn",
-    ],
 )

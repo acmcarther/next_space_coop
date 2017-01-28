@@ -1,6 +1,0 @@
-message ImportedMessage {
-}
-
-enum ImportedEnum {
-    SOMETHING = 1;
-}
