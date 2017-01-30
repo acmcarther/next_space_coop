@@ -1,5 +1,5 @@
 use clap::ArgMatches;
-use ::network::Network;
+use network::Network;
 use protocol_proto::protocol::Packet;
 use protocol_proto::protocol::Packet_MessageType;
 use network_proto::network::ClientMessage;
