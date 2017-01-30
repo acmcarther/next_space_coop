@@ -18,6 +18,7 @@ licenses(["notice"])
 rust_library(
     name = "num_rational",
     deps = ["//third_party/cargo2bazel/internal/num-bigint-0.1.35/default-11648069979105038:num_bigint", 
+            "//third_party/cargo2bazel/internal/rustc-serialize-0.3.22/default-11648069979105038:rustc_serialize", 
             "//third_party/cargo2bazel/internal/num-traits-0.1.36/default-11648069979105038:num_traits", 
             "//third_party/cargo2bazel/internal/num-integer-0.1.32/default-11648069979105038:num_integer"],
     srcs = ["//third_party/cargo2bazel/internal/num-rational-0.1.35:sources"],

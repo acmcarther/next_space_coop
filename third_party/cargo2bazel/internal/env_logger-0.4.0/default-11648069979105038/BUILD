@@ -17,7 +17,8 @@ licenses(["notice"])
 
 rust_library(
     name = "env_logger",
-    deps = ["//third_party/cargo2bazel/internal/log-0.3.6/default-11648069979105038:log"],
+    deps = ["//third_party/cargo2bazel/internal/regex-0.2.1/default-11648069979105038:regex", 
+            "//third_party/cargo2bazel/internal/log-0.3.6/default-11648069979105038:log"],
     srcs = ["//third_party/cargo2bazel/internal/env_logger-0.4.0:sources"],
     rustc_flags = [
       "--cap-lints warn",

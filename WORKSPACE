@@ -7,14 +7,14 @@ git_repository(
 git_repository(
     name = "io_bazel_rules_rust",
     remote = "https://github.com/acmcarther/rules_rust.git",
-    commit = "c157716"
+    commit = "49a7345"
 )
 load("@io_bazel_rules_rust//rust:rust.bzl", "rust_repositories")
 
 git_repository(
     name = "io_bazel_cargo2bazel",
     remote = "https://github.com/acmcarther/cargo2bazel.git",
-    commit = "a28580b"
+    commit = "c628dd5"
 )
 
 new_git_repository(
