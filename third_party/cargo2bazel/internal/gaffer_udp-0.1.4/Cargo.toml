@@ -1,0 +1,23 @@
+[package]
+name = "gaffer_udp"
+version = "0.1.4"
+authors = ["Alex McArther <acmcarther@gmail.com>"]
+description = "A protocol on top of udp providing some reliability. Not ready for public consumption."
+repository = "https://github.com/acmcarther/gaffer_udp"
+license = "MIT"
+readme = "README.md"
+
+
+[dev-dependencies]
+cucumber = "0.1.3"
+
+
+[dependencies]
+byteorder = "1.0.0"
+itertools = "0.5.8"
+mio = "0.6.2"
+
+
+[[test]]
+name = "cucumber"
+path = "./features/cuke.rs"

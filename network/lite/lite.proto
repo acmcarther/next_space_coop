@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package network.lite;
+
+message LiteMessage {
+  enum Type {
+    KEEP_ALIVE = 0;
+    SYN = 1;
+    SYN_ACK = 2;
+    ACK = 3;
+    CLOSE = 4;
+    UNKNOWN_SENDER = 5;
+    DATA = 6;
+  }
+  optional Type packet_type = 1;
+  optional uint32 origin_id = 2;
+  optional uint32 set_your_id = 3;
+  optional bytes data = 4;
+}

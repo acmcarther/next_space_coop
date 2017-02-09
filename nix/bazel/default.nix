@@ -2,8 +2,7 @@
   which, makeWrapper, binutils }:
 
 let
-
-  version = "0.4.3";
+  version = "0.4.4";
 
   meta = with stdenv.lib; {
     homepage = http://github.com/bazelbuild/bazel/;
@@ -25,11 +24,11 @@ let
     name = "bazel-${version}";
 
     src = fetchurl {
-      url = "https://github.com/bazelbuild/bazel/releases/download/0.4.3/bazel-0.4.3-dist.zip";
-      sha256 = "03zrch5m4kagzssxa75hrabjvvfdbf1bzchqrwbp7hc105caplnb";
+      url = "https://github.com/bazelbuild/bazel/releases/download/0.4.4/bazel-0.4.4-dist.zip";
+      sha256 = "1fwfahkqi680zyxmdriqj603lpacyh6cg6ff25bn9bkilbfj2anm";
     };
     sourceRoot = ".";
-    patches = [ ./java_stub_template.patch ./allow_overriding_sh.patch ];
+    patches = [ ./allow_overriding_sh.patch ./fix_shebangs.patch ];
 
     packagesNotFromEnv = [
         stdenv.cc stdenv.cc.cc.lib jdk which zip unzip binutils ];

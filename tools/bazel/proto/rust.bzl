@@ -33,7 +33,7 @@ def rust_proto_library(
 
   native.genrule(
     name = name + "lib_rs",
-    outs = ["lib.rs"],
+    outs = [name + "_lib.rs"],
     # This is a pretty naive soln
     cmd = "echo \"" + lib_rs_content + "\" > $@"
   )
@@ -41,5 +41,6 @@ def rust_proto_library(
   rust_library(
     name = name,
     srcs = [name + "lib_rs"] + [name + ".pb"],
+    crate_root = name + "_lib.rs",
     deps = ["@protoc_gen_rust//:protobuf",] + proto_deps,
   )

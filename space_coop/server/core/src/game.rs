@@ -1,13 +1,9 @@
 use clap::ArgMatches;
-use network::Network;
-use protocol_proto::protocol::Packet;
-use protocol_proto::protocol::Packet_MessageType;
 use network_proto::network::ClientMessage;
 use network_proto::network::ClientMessage_MessageType;
 use network_proto::network::ServerMessage;
 use network_proto::network::ServerMessage_MessageType;
-use service_proto::service::Resource;
-use player_proto::player::PlayerData;
+use state_proto::state::NetworkPlayer;
 use protobuf;
 use loadable::Game;
 use protobuf::Message;
@@ -18,13 +14,16 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::str::FromStr;
 use gaffer_udp::packet::GafferPacket;
+use lite::LiteServer;
+use lite::LiteServerEvent;
+use lite;
 
 /**
  * The exported type that is passed unmodified between loads
  *
  * WARNING: CHANGING THE SIGNATURE OF THIS TYPE MAY BREAK HOTLOADS.
  */
-pub type Transient = Network;
+pub type Transient = LiteServer;
 
 /**
  * The exported type that is serialized and deserialized
@@ -35,149 +34,103 @@ pub use state_proto::state::State;
 
 pub struct RunningGame {
   state: State,
-  players: PlayerData,
-  network: Network,
+  network: LiteServer,
   last_run_time: PreciseTime,
 }
 
-fn keep_alive_packet() -> Vec<u8> {
-  let mut packet = Packet::new();
-  packet.set_message_type(Packet_MessageType::KEEP_ALIVE);
-  packet.write_to_bytes().expect("couldn't convert packet to bytes")
-}
-
-fn connected_packet() -> Vec<u8> {
-  let mut packet = Packet::new();
-  packet.set_message_type(Packet_MessageType::DATAGRAM);
-  let mut msg = ServerMessage::new();
-  msg.set_message_type(ServerMessage_MessageType::CONNECTED);
-  packet.set_payload(msg.write_to_bytes().expect("Couldnt convert message to bytes"));
-
-  packet.write_to_bytes().expect("couldn't convert packet to bytes")
-}
-
-fn disconnected_packet() -> Vec<u8> {
-  let mut packet = Packet::new();
-  packet.set_message_type(Packet_MessageType::DATAGRAM);
-  let mut msg = ServerMessage::new();
-  msg.set_message_type(ServerMessage_MessageType::DISCONNECTED);
-  packet.set_payload(msg.write_to_bytes().expect("Couldnt convert message to bytes"));
-
-  packet.write_to_bytes().expect("couldn't convert packet to bytes")
-}
-
-fn resource_list_into_map(resources: RepeatedField<Resource>) -> HashMap<String, Resource>{
-  let mut result = HashMap::new();
-
-  resources.into_iter()
-    .filter(|resource| {
-      let is_unnamed = resource.get_name().is_empty();
-      if is_unnamed {
-        warn!("Dropped some unnamed resource on hotload")
-      }
-      !is_unnamed
-    })
-    .foreach(|resource| {
-      let name = resource.get_name().to_owned();
-      if result.contains_key(&name) {
-        warn!("Dropped the second instance of resource {}", name);
-      } else {
-        result.insert(name, resource);
-      }
-    });
-
-  result
-}
-
-fn try_parse_player_resource(resource: Option<Resource>) -> PlayerData {
-  if resource.is_none() {
-    info!("Player resource data not present, building fresh");
-    return PlayerData::new();
-  }
-
-  let res = resource.unwrap();
-
-  match protobuf::parse_from_bytes(res.get_data()) {
-    Ok(data) => data,
-    _ => {
-      warn!("Could not parse last PlayerData, building fresh");
-      PlayerData::new()
-    }
-  }
-}
-
 impl RunningGame {
-  fn new(mut state: State, network: Network) -> RunningGame {
+  fn new(mut state: State, network: LiteServer) -> RunningGame {
     trace!("Hotloading with: {:?}", state);
-    let resources = state.take_resources();
-    let mut resource_map = resource_list_into_map(resources);
-    let player_resource = try_parse_player_resource(resource_map.remove("players"));
     RunningGame {
       state: state,
-      players: player_resource,
       network: network,
       last_run_time: PreciseTime::now(),
     }
   }
 
   fn update_network_state(&mut self) {
-    let mut ip_to_player_idx: HashMap<String, usize> = HashMap::new();
-    self.players.get_players().iter()
-      .enumerate()
-      .foreach(|(idx, player)| {
-        ip_to_player_idx.insert(player.get_ip().to_owned(), idx);
-      });
-
     let mut outgoing_msgs = Vec::new();
+    let mut incoming_msgs = self.network.read();
 
-    while let Ok(Some(pkt)) = self.network.socket.recv() {
-      let addr_str = pkt.addr.to_string();
-      let idx_opt = ip_to_player_idx.get(&addr_str).cloned();
-
-      let idx = if idx_opt.is_none() {
-        let map_size = ip_to_player_idx.len();
-        ip_to_player_idx.insert(addr_str.clone(), map_size);
-        map_size
-      } else {
-        idx_opt.unwrap().clone()
-      };
-
-
-      let player = self.players.mut_players().get_mut(idx).unwrap();
-
-      let message_opt = protobuf::parse_from_bytes::<Packet>(&pkt.payload).ok();
-      if message_opt.is_some() {
-        let message = message_opt.unwrap();
-        match message.get_message_type() {
-          Packet_MessageType::DATAGRAM => {
-            let payload_bytes = message.get_payload();
-            let msg_opt = protobuf::parse_from_bytes::<ClientMessage>(payload_bytes).ok();
-            if let Some(msg) = msg_opt {
-              match msg.get_message_type() {
-                ClientMessage_MessageType::CONNECT => {
-                  player.set_connected(true);
-                  outgoing_msgs.push(GafferPacket::new(SocketAddr::from_str(&addr_str).unwrap(), connected_packet()))
-                },
-                ClientMessage_MessageType::DISCONNECT => {
-                  player.set_connected(false);
-                  outgoing_msgs.push(GafferPacket::new(SocketAddr::from_str(&addr_str).unwrap(), disconnected_packet()))
-                },
-                _ => {}
-              }
-            }
-          }
-          _ => {}
-        }
-
-      }
-      outgoing_msgs.push(GafferPacket::new(SocketAddr::from_str(&addr_str).unwrap(), keep_alive_packet()))
+    while !incoming_msgs.is_empty() {
+      outgoing_msgs.extend(self.process_messages(incoming_msgs));
+      incoming_msgs = self.network.read();
     }
 
-    outgoing_msgs.into_iter().foreach(|msg| {
-      if self.network.socket.send(msg).is_err() {
-        warn!("Failed to enqueue network message")
+    outgoing_msgs.into_iter().foreach(|(client_id, msg)| {
+      match self.network.write(client_id, msg) {
+        lite::WriteResult::Success => {},
+        lite::WriteResult::Failure_NotConnected => {
+          trace!("Oops, tried to write a message to {}, who is disconnected.", client_id);
+          self.find_or_establish_player(client_id).set_connected(false);
+        },
       }
     });
+  }
+
+  fn process_messages(&mut self, events: Vec<LiteServerEvent>) -> Vec<(u32, Vec<u8>)> {
+    use lite::LiteServerEvent::*;
+
+    for event in events.into_iter() {
+      match event {
+        ConnectionEstablished { client_id } => {
+          let player = self.find_or_establish_player(client_id);
+          player.set_connected(true);
+        }
+        ConnectionDropped_Disconnect { client_id } | ConnectionDropped_Lag { client_id } => {
+          let player = self.find_or_establish_player(client_id);
+          player.set_connected(false);
+        }
+        Data { client_id, bytes } => {
+          let player = self.find_or_establish_player(client_id);
+          if player.get_connected() == false {
+            trace!("Disconnected player {} is still talking. Is it a ghost?", client_id);
+            continue;
+          }
+
+          let message_res = protobuf::parse_from_bytes::<ClientMessage>(&bytes);
+          if message_res.is_err() {
+            trace!("Player {} sent a malformed payload", client_id);
+            continue;
+          }
+
+          let message = message_res.unwrap();
+          match message.get_message_type() {
+            ClientMessage_MessageType::UNKNOWN => {
+              trace!("Player {} sent well formed unknown type payload.", client_id);
+            },
+            ClientMessage_MessageType::MOVE => {
+              let move_data = message.get_move_data();
+              trace!("Player {} tried to move to {} but we dont support moving yet.", client_id, move_data.get_y());
+            }
+          }
+        }
+      }
+    }
+
+    // We don't have anything to say yet.
+    Vec::new()
+  }
+
+  fn find_or_establish_player(&mut self, client_id: u32) -> &mut NetworkPlayer {
+    // TODO(acmcarther): Non-lexical lifetimes. This uses an intermediate idx because of lifetime
+    // issues
+    // TODO(acmcarther): Use a hash map if it even matters
+    let player_idx = self.state.mut_players()
+      .iter_mut()
+      .enumerate()
+      .filter(|&(_, ref p)| p.get_id() == client_id)
+      .map(|(idx, _)| idx)
+      .next()
+      .unwrap_or_else(|| {
+        let players = self.state.mut_players();
+        let mut new_player = NetworkPlayer::new();
+        new_player.set_id(client_id);
+        players.push(new_player);
+        players.len()
+      });
+
+    self.state.mut_players().get_mut(player_idx).unwrap()
   }
 }
 
@@ -192,10 +145,10 @@ impl Game<State, Transient> for RunningGame {
       .value_of("port")
       .and_then(|v| u16::from_str(&v).ok())
       .unwrap();
-    RunningGame::new(state, Network::new(port))
+    RunningGame::new(state, LiteServer::new(("0.0.0.0", port)))
   }
 
-  fn from_opaque(state: State, network: Network) -> RunningGame {
+  fn from_opaque(state: State, network: LiteServer) -> RunningGame {
     RunningGame::new(state, network)
   }
 
@@ -215,10 +168,6 @@ impl Game<State, Transient> for RunningGame {
 
   fn build_state(&self) -> State {
     let mut state = self.state.clone();
-    let mut player_resource = Resource::new();
-    player_resource.set_name("players".to_owned());
-    player_resource.set_data(self.players.write_to_bytes().expect("Couldn't write players proto"));
-    state.mut_resources().push(player_resource);
     state
   }
 

@@ -1,9 +1,6 @@
 extern crate state_proto;
-extern crate service_proto;
-extern crate player_proto;
-extern crate protocol_proto;
+extern crate lite;
 extern crate network_proto;
-extern crate service;
 extern crate libc;
 extern crate clap;
 extern crate protobuf;
@@ -21,7 +18,6 @@ extern crate lazy_static;
 extern crate log;
 
 mod game;
-mod network;
 
 use loadable::SnapshottedGame;
 use game::State;
@@ -38,7 +34,7 @@ fn init_logger() {
       level: log::LogLevelFilter::Trace,
   };
 
-  fern::init_global_logger(logger_config, log::LogLevelFilter::Info)
+  fern::init_global_logger(logger_config, log::LogLevelFilter::Trace)
     .expect("could not load logger");
 
   info!("Started dylib logger");

@@ -7,5 +7,5 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])
 alias(
     name = "gaffer_udp",
-    actual = "//third_party/cargo2bazel/internal/gaffer_udp-0.1.3/default-11648069979105038:gaffer_udp",
+    actual = "//third_party/cargo2bazel/internal/gaffer_udp-0.1.4/default-11648069979105038:gaffer_udp",
 )

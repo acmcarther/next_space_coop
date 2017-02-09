@@ -4,19 +4,21 @@ package space_coop.common.network;
 
 message ClientMessage {
   enum MessageType {
-    KEEP_ALIVE = 0;
-    CONNECT = 1;
-    DISCONNECT = 2;
+    UNKNOWN = 0;
+    MOVE = 1;
+  }
+
+  message MoveData {
+    optional uint32 y = 1;
   }
 
   optional MessageType message_type = 1;
+  optional MoveData move_data = 2;
 }
 
 message ServerMessage {
   enum MessageType {
-    KEEP_ALIVE = 0;
-    CONNECTED = 1;
-    DISCONNECTED = 2;
+    UNKNOWN = 0;
   }
 
   optional MessageType message_type = 1;

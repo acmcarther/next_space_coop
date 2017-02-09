@@ -7,7 +7,7 @@ dependencies = [
  "env_logger 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "error-chain 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "fern 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "gaffer_udp 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gaffer_udp 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "itertools 0.5.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.18 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -124,7 +124,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "gaffer_udp"
-version = "0.1.3"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -691,7 +691,7 @@ dependencies = [
 "checksum error-chain 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)" = "6930e04918388a9a2e41d518c25cf679ccafe26733fb4127dbf21993f2575d46"
 "checksum fern 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)" = "4d2f58d053ad7791bfaad58a3f3541fe2d2aecc564dd82aee7f92fa402c054b2"
 "checksum fnv 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)" = "6cc484842f1e2884faf56f529f960cc12ad8c71ce96cc7abba0a067c98fee344"
-"checksum gaffer_udp 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)" = "3cc651f1a05c5b5be644cfc0d0b680c2d58e2a01a2889d708e2569d89bf62260"
+"checksum gaffer_udp 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)" = "fb92e98286bd4163213ac5c0d43c1bb0cf0056f577ea8b6590980cb6ec34cdba"
 "checksum itertools 0.5.9 (registry+https://github.com/rust-lang/crates.io-index)" = "d95557e7ba6b71377b0f2c3b3ae96c53f1b75a926a6901a500f557a370af730a"
 "checksum itoa 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "ae3088ea4baeceb0284ee9eea42f591226e6beaecf65373e41b38d95a1b8e7a1"
 "checksum kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7507624b29483431c0ba2d82aece8ca6cdba9382bff4ddd0f7490560c056098d"

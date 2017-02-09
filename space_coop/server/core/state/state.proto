@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package space_coop.server.core.state;
+
+// The time, and associated mode
+message Time {
+  enum TimeMode {
+    NORMAL = 1;
+    REPLAY = 2;
+  }
+  optional TimeMode mode = 1;
+  optional int64 timestamp = 2;
+  optional int64 rewind_timestamp = 3;
+}
+
+// The required components to create our network
+message NetworkConfig {
+  optional int32 port = 1;
+}
+
+// The total state of the game world.
+message State {
+  optional Time time = 1;
+  optional NetworkConfig network = 2;
+  repeated NetworkPlayer players = 3;
+}
+
+// A network connection with a person behind it
+message NetworkPlayer {
+  optional uint32 id = 1;
+  optional bool connected = 2;
+}

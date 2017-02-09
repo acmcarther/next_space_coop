@@ -1,0 +1,1981 @@
+From 95683344a70d67b8dde9333e7f1316707483775a Mon Sep 17 00:00:00 2001
+From: Alex McArther <acmcarther@gmail.com>
+Date: Fri, 3 Feb 2017 18:38:22 -0800
+Subject: [PATCH] Fix shebangs
+
+---
+ compile.sh                                             |  2 +-
+ examples/shell/bin.sh                                  |  2 +-
+ examples/shell/lib.sh                                  |  2 +-
+ examples/shell/test.sh                                 |  2 +-
+ scripts/bash_completion_test.sh                        |  2 +-
+ scripts/bazel-run.sh                                   |  2 +-
+ scripts/bootstrap/bootstrap.sh                         |  2 +-
+ scripts/bootstrap/buildenv.sh                          |  2 +-
+ scripts/bootstrap/compile.sh                           |  2 +-
+ scripts/ci/build.sh                                    |  2 +-
+ scripts/ci/windows/compile_windows.sh                  |  2 +-
+ scripts/packages/bazel.sh                              |  2 +-
+ scripts/packages/template_bin.sh                       |  2 +-
+ scripts/release/common.sh                              |  2 +-
+ scripts/release/release.sh                             |  2 +-
+ scripts/release/release_test.sh                        | 10 +++++-----
+ scripts/release/relnotes.sh                            |  2 +-
+ scripts/release/relnotes_test.sh                       |  2 +-
+ scripts/release/testenv.sh                             |  2 +-
+ scripts/serve-docs.sh                                  |  2 +-
+ scripts/testenv.sh                                     |  2 +-
+ site/jekyll-tree.sh                                    |  2 +-
+ .../build/java/bazel/java-langtools-location.sh        |  2 +-
+ .../build/java/bazel/javac-bootclasspath-locations.sh  |  2 +-
+ .../com/google/devtools/build/zip/ZipWriterTest.java   |  6 +++---
+ .../devtools/build/lib/analysis/CommandHelper.java     |  2 +-
+ .../build/lib/bazel/rules/java/java_stub_template.txt  |  2 +-
+ src/main/native/build_windows_jni.sh                   |  2 +-
+ .../build/lib/pkgcache/IncrementalLoadingTest.java     |  4 ++--
+ .../devtools/build/lib/skylark/SkylarkAspectsTest.java |  2 +-
+ .../shell/bazel/android/android_integration_test.sh    |  2 +-
+ src/test/shell/bazel/apple/bazel_apple_test.sh         |  2 +-
+ src/test/shell/bazel/apple/bazel_objc_test.sh          |  2 +-
+ src/test/shell/bazel/bazel_bootstrap_distfile_test.sh  |  2 +-
+ src/test/shell/bazel/bazel_coverage_test.sh            |  2 +-
+ src/test/shell/bazel/bazel_docgen_test.sh              |  2 +-
+ src/test/shell/bazel/bazel_example_test.sh             |  2 +-
+ src/test/shell/bazel/bazel_execute_testlog.sh          |  2 +-
+ src/test/shell/bazel/bazel_java_test.sh                |  2 +-
+ src/test/shell/bazel/bazel_localtest_test.sh           |  4 ++--
+ src/test/shell/bazel/bazel_repository_cache_test.sh    |  6 +++---
+ src/test/shell/bazel/bazel_rules_test.sh               |  6 +++---
+ src/test/shell/bazel/bazel_sandboxing_cpp_test.sh      |  2 +-
+ src/test/shell/bazel/bazel_sandboxing_test.sh          |  2 +-
+ src/test/shell/bazel/bazel_sandboxing_test_utils.sh    |  2 +-
+ src/test/shell/bazel/bazel_test_test.sh                | 10 +++++-----
+ src/test/shell/bazel/bazel_toolchain_test.sh           |  2 +-
+ src/test/shell/bazel/bazel_tools_test.sh               |  2 +-
+ src/test/shell/bazel/bazel_windows_example_test.sh     |  2 +-
+ src/test/shell/bazel/bazel_workspace_status_test.sh    | 12 ++++++------
+ src/test/shell/bazel/bound_targets_test.sh             |  2 +-
+ src/test/shell/bazel/build_files_test.sh               |  2 +-
+ src/test/shell/bazel/cc_inc_library_test.sh            |  2 +-
+ src/test/shell/bazel/client_test.sh                    |  2 +-
+ src/test/shell/bazel/cross_repository_test.sh          |  2 +-
+ src/test/shell/bazel/empty_package.sh                  |  2 +-
+ src/test/shell/bazel/execroot_test.sh                  |  2 +-
+ src/test/shell/bazel/external_correctness_test.sh      |  2 +-
+ src/test/shell/bazel/external_integration_test.sh      | 18 +++++++++---------
+ src/test/shell/bazel/external_skylark_load_test.sh     |  2 +-
+ src/test/shell/bazel/generate_workspace_test.sh        |  2 +-
+ src/test/shell/bazel/git_repository_test.sh            | 10 +++++-----
+ src/test/shell/bazel/help_test.sh                      |  2 +-
+ src/test/shell/bazel/linux-sandbox_test.sh             |  2 +-
+ src/test/shell/bazel/local_repository_test.sh          |  4 ++--
+ src/test/shell/bazel/local_repository_test_jdk8.sh     |  2 +-
+ src/test/shell/bazel/location_test.sh                  |  2 +-
+ src/test/shell/bazel/maven_skylark_test.sh             |  2 +-
+ src/test/shell/bazel/maven_test.sh                     |  2 +-
+ src/test/shell/bazel/persistent_test_runner_test.sh    |  2 +-
+ src/test/shell/bazel/process-wrapper_test.sh           |  2 +-
+ src/test/shell/bazel/remote_execution_test.sh          |  2 +-
+ src/test/shell/bazel/remote_helpers.sh                 |  2 +-
+ src/test/shell/bazel/rule_test_test.sh                 |  2 +-
+ src/test/shell/bazel/runfiles_test.sh                  |  2 +-
+ src/test/shell/bazel/skylark_repository_test.sh        |  4 ++--
+ src/test/shell/bazel/workspace_test.sh                 |  2 +-
+ src/test/shell/integration/action_env_test.sh          |  2 +-
+ src/test/shell/integration/bazel_command_log_test.sh   |  2 +-
+ src/test/shell/integration/bazel_javabase_test.sh      |  2 +-
+ src/test/shell/integration/bazel_query_test.sh         |  2 +-
+ src/test/shell/integration/bazel_testjobs_test.sh      |  2 +-
+ src/test/shell/integration/bazel_worker_test.sh        |  2 +-
+ src/test/shell/integration/build_event_stream_test.sh  |  2 +-
+ src/test/shell/integration/client_sigint_test.sh       |  2 +-
+ .../shell/integration/discard_analysis_cache_test.sh   |  2 +-
+ src/test/shell/integration/discard_graph_edges_test.sh |  2 +-
+ src/test/shell/integration/experimental_ui_test.sh     |  2 +-
+ src/test/shell/integration/force_delete_output_test.sh |  2 +-
+ src/test/shell/integration/ide_info_generation.sh      |  2 +-
+ src/test/shell/integration/java_integration_test.sh    |  2 +-
+ src/test/shell/integration/loading_phase_tests.sh      |  2 +-
+ src/test/shell/integration/output_filter_test.sh       |  8 ++++----
+ src/test/shell/integration/progress_reporting_test.sh  |  4 ++--
+ src/test/shell/integration/rc_options_test.sh          |  2 +-
+ src/test/shell/integration/run_test.sh                 |  8 ++++----
+ src/test/shell/integration/runfiles_test.sh            |  2 +-
+ src/test/shell/integration/startup_options_test.sh     |  2 +-
+ src/test/shell/integration/stub_finds_runfiles_test.sh | 10 +++++-----
+ src/test/shell/integration/ui_test.sh                  |  2 +-
+ src/test/shell/integration_test_setup.sh               |  2 +-
+ src/test/shell/shell_utils.sh                          |  2 +-
+ src/test/shell/shell_utils_test.sh                     |  2 +-
+ src/test/shell/testenv.sh                              |  2 +-
+ src/test/shell/unittest_test.sh                        |  8 ++++----
+ src/tools/singlejar/output_jar_shell_test.sh           |  4 ++--
+ src/tools/singlejar/zip64_test.sh                      |  2 +-
+ src/tools/xcode/actoolwrapper/actoolwrapper.sh         |  2 +-
+ src/tools/xcode/environment/environment_plist.sh       |  2 +-
+ src/tools/xcode/ibtoolwrapper/ibtoolwrapper.sh         |  2 +-
+ src/tools/xcode/libtool/libtool.sh                     |  2 +-
+ src/tools/xcode/momcwrapper/momcwrapper.sh             |  2 +-
+ .../swiftstdlibtoolwrapper/swiftstdlibtoolwrapper.sh   |  2 +-
+ src/tools/xcode/xcrunwrapper/xcrunwrapper.sh           |  2 +-
+ third_party/ijar/test/ijar_test.sh                     |  2 +-
+ third_party/ijar/test/testenv.sh                       |  2 +-
+ third_party/ijar/test/zip_test.sh                      |  2 +-
+ third_party/nanopb/tools/make_linux_package.sh         |  4 ++--
+ third_party/nanopb/tools/make_mac_package.sh           |  4 ++--
+ third_party/nanopb/tools/make_windows_package.sh       |  2 +-
+ third_party/nanopb/tools/set_version.sh                |  2 +-
+ tools/android/fail.sh                                  |  2 +-
+ tools/android/jack/fail.sh                             |  2 +-
+ tools/android/zip_manifest_creator.sh                  |  2 +-
+ tools/android/zip_manifest_creator_test.sh             |  2 +-
+ tools/build_defs/docker/build_test.sh                  |  2 +-
+ tools/build_defs/docker/build_test_oci.sh              |  2 +-
+ tools/build_defs/docker/testenv.sh                     |  2 +-
+ tools/build_defs/pkg/build_test.sh                     |  2 +-
+ tools/build_defs/pkg/testenv.sh                        |  2 +-
+ tools/coverage/collect-coverage.sh                     |  2 +-
+ tools/cpp/link_dynamic_library.sh                      |  2 +-
+ tools/cpp/osx_cc_wrapper.sh                            |  2 +-
+ tools/objc/protobuf_compiler_wrapper.sh                |  2 +-
+ tools/osx/xcode_locator_stub.sh                        |  2 +-
+ tools/python/2to3.sh                                   |  2 +-
+ tools/test/collect_coverage.sh                         |  2 +-
+ tools/test/test-setup.sh                               |  2 +-
+ 138 files changed, 190 insertions(+), 190 deletions(-)
+
+diff --git a/compile.sh b/compile.sh
+index dfc3d71..5a724f2 100755
+--- a/compile.sh
++++ b/compile.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2014 The Bazel Authors. All rights reserved.
+ #
+diff --git a/examples/shell/bin.sh b/examples/shell/bin.sh
+index 5b51ccf..4522610 100755
+--- a/examples/shell/bin.sh
++++ b/examples/shell/bin.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/examples/shell/lib.sh b/examples/shell/lib.sh
+index 495ef3d..d1ddf63 100755
+--- a/examples/shell/lib.sh
++++ b/examples/shell/lib.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/examples/shell/test.sh b/examples/shell/test.sh
+index 6b7ba90..9212b19 100755
+--- a/examples/shell/test.sh
++++ b/examples/shell/test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/bash_completion_test.sh b/scripts/bash_completion_test.sh
+index 1f261bc..8c3aeee 100755
+--- a/scripts/bash_completion_test.sh
++++ b/scripts/bash_completion_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/bazel-run.sh b/scripts/bazel-run.sh
+index d259b42..54fcafd 100755
+--- a/scripts/bazel-run.sh
++++ b/scripts/bazel-run.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/bootstrap/bootstrap.sh b/scripts/bootstrap/bootstrap.sh
+index ee754f7..5c751dc 100755
+--- a/scripts/bootstrap/bootstrap.sh
++++ b/scripts/bootstrap/bootstrap.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/bootstrap/buildenv.sh b/scripts/bootstrap/buildenv.sh
+index 502f2c1..dc64490 100755
+--- a/scripts/bootstrap/buildenv.sh
++++ b/scripts/bootstrap/buildenv.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/bootstrap/compile.sh b/scripts/bootstrap/compile.sh
+index 30495ba..218f3ab 100755
+--- a/scripts/bootstrap/compile.sh
++++ b/scripts/bootstrap/compile.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/ci/build.sh b/scripts/ci/build.sh
+index 32fc7bc..d2b0d19 100755
+--- a/scripts/ci/build.sh
++++ b/scripts/ci/build.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/ci/windows/compile_windows.sh b/scripts/ci/windows/compile_windows.sh
+index 6601653..c7a8928 100755
+--- a/scripts/ci/windows/compile_windows.sh
++++ b/scripts/ci/windows/compile_windows.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/packages/bazel.sh b/scripts/packages/bazel.sh
+index 43bc593..cb52601 100755
+--- a/scripts/packages/bazel.sh
++++ b/scripts/packages/bazel.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/packages/template_bin.sh b/scripts/packages/template_bin.sh
+index c35b246..e9ad850 100755
+--- a/scripts/packages/template_bin.sh
++++ b/scripts/packages/template_bin.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/release/common.sh b/scripts/release/common.sh
+index 7cea006..a4f7807 100755
+--- a/scripts/release/common.sh
++++ b/scripts/release/common.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/release/release.sh b/scripts/release/release.sh
+index 988c497..3240ccf 100755
+--- a/scripts/release/release.sh
++++ b/scripts/release/release.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/release/release_test.sh b/scripts/release/release_test.sh
+index 471953a..0970b77 100755
+--- a/scripts/release/release_test.sh
++++ b/scripts/release/release_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+@@ -236,7 +236,7 @@ EOF
+   echo "Test replacement" >${TEST_TMPDIR}/replacement.log
+ 
+   cat >${EDITOR} <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # 1. Assert the file is correct
+ if [ "\$(cat \$1)" != "\$(cat ${TEST_TMPDIR}/expected.log)" ]; then
+@@ -323,7 +323,7 @@ ${revision_info}
+ 
+   # Third release to test abandon
+   cat >${EDITOR} <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ # Make sure we have release notes or the release will be cancelled.
+ echo 'Dummy release' >\$1
+ EOF
+@@ -414,7 +414,7 @@ EOF
+   echo "Test replacement" >${TEST_TMPDIR}/replacement.log
+ 
+   cat >${EDITOR} <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # 1. Assert the file is correct
+ if [ "\$(cat \$1)" != "\$(cat ${TEST_TMPDIR}/expected.log)" ]; then
+@@ -488,7 +488,7 @@ Cherry picks:
+ 
+   # Third release to test abandon
+   cat >${EDITOR} <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ # Make sure we have release notes or the release will be cancelled.
+ echo 'Dummy release' >\$1
+ EOF
+diff --git a/scripts/release/relnotes.sh b/scripts/release/relnotes.sh
+index 2c4a0ab..28b00a7 100755
+--- a/scripts/release/relnotes.sh
++++ b/scripts/release/relnotes.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/release/relnotes_test.sh b/scripts/release/relnotes_test.sh
+index 972a4e3..e368f58 100755
+--- a/scripts/release/relnotes_test.sh
++++ b/scripts/release/relnotes_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/release/testenv.sh b/scripts/release/testenv.sh
+index f11c8ab..c4b3a0f 100755
+--- a/scripts/release/testenv.sh
++++ b/scripts/release/testenv.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/scripts/serve-docs.sh b/scripts/serve-docs.sh
+index 0ab17dc..e26476a 100755
+--- a/scripts/serve-docs.sh
++++ b/scripts/serve-docs.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/scripts/testenv.sh b/scripts/testenv.sh
+index 25fa4eb..77dbf02 100755
+--- a/scripts/testenv.sh
++++ b/scripts/testenv.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/site/jekyll-tree.sh b/site/jekyll-tree.sh
+index c2c8e98..c47c67e 100755
+--- a/site/jekyll-tree.sh
++++ b/site/jekyll-tree.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/src/java_tools/buildjar/java/com/google/devtools/build/java/bazel/java-langtools-location.sh b/src/java_tools/buildjar/java/com/google/devtools/build/java/bazel/java-langtools-location.sh
+index 5c376be..93568ab 100755
+--- a/src/java_tools/buildjar/java/com/google/devtools/build/java/bazel/java-langtools-location.sh
++++ b/src/java_tools/buildjar/java/com/google/devtools/build/java/bazel/java-langtools-location.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash -eu
++#!/usr/bin/env bash -eu
+ 
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/java_tools/buildjar/java/com/google/devtools/build/java/bazel/javac-bootclasspath-locations.sh b/src/java_tools/buildjar/java/com/google/devtools/build/java/bazel/javac-bootclasspath-locations.sh
+index 4772dfd..f956ed1 100755
+--- a/src/java_tools/buildjar/java/com/google/devtools/build/java/bazel/javac-bootclasspath-locations.sh
++++ b/src/java_tools/buildjar/java/com/google/devtools/build/java/bazel/javac-bootclasspath-locations.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash -eu
++#!/usr/bin/env bash -eu
+ 
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/java_tools/singlejar/javatests/com/google/devtools/build/zip/ZipWriterTest.java b/src/java_tools/singlejar/javatests/com/google/devtools/build/zip/ZipWriterTest.java
+index 681d3ce..0eb0515 100644
+--- a/src/java_tools/singlejar/javatests/com/google/devtools/build/zip/ZipWriterTest.java
++++ b/src/java_tools/singlejar/javatests/com/google/devtools/build/zip/ZipWriterTest.java
+@@ -260,7 +260,7 @@ public class ZipWriterTest {
+     ZipWriter writer = new ZipWriter(new FileOutputStream(test), UTF_8);
+ 
+     writer.startPrefixFile();
+-    writer.write("#!/bin/bash\necho 'hello world'\n".getBytes(UTF_8));
++    writer.write("#!/usr/bin/env bash\necho 'hello world'\n".getBytes(UTF_8));
+     writer.endPrefixFile();
+ 
+     byte[] content = "content".getBytes(UTF_8);
+@@ -310,7 +310,7 @@ public class ZipWriterTest {
+       thrown.expect(ZipException.class);
+       thrown.expectMessage("Cannot add a prefix file after the zip contents have been started.");
+       writer.startPrefixFile();
+-      writer.write("#!/bin/bash\necho 'hello world'\n".getBytes(UTF_8));
++      writer.write("#!/usr/bin/env bash\necho 'hello world'\n".getBytes(UTF_8));
+       writer.endPrefixFile();
+     }
+   }
+@@ -320,7 +320,7 @@ public class ZipWriterTest {
+       writer.finish();
+       thrown.expect(IllegalStateException.class);
+       writer.startPrefixFile();
+-      writer.write("#!/bin/bash\necho 'hello world'\n".getBytes(UTF_8));
++      writer.write("#!/usr/bin/env bash\necho 'hello world'\n".getBytes(UTF_8));
+       writer.endPrefixFile();
+     }
+   }
+diff --git a/src/main/java/com/google/devtools/build/lib/analysis/CommandHelper.java b/src/main/java/com/google/devtools/build/lib/analysis/CommandHelper.java
+index 3ffc18c..d6bf700 100644
+--- a/src/main/java/com/google/devtools/build/lib/analysis/CommandHelper.java
++++ b/src/main/java/com/google/devtools/build/lib/analysis/CommandHelper.java
+@@ -242,7 +242,7 @@ public final class CommandHelper {
+   private static Artifact buildCommandLineArtifact(RuleContext ruleContext, String command,
+       String scriptPostFix) {
+     String scriptFileName = ruleContext.getTarget().getName() + scriptPostFix;
+-    String scriptFileContents = "#!/bin/bash\n" + command;
++    String scriptFileContents = "#!/usr/bin/env bash\n" + command;
+     Artifact scriptFileArtifact = FileWriteAction.createFile(
+         ruleContext, scriptFileName, scriptFileContents, /*executable=*/true);
+     return scriptFileArtifact;
+diff --git a/src/main/java/com/google/devtools/build/lib/bazel/rules/java/java_stub_template.txt b/src/main/java/com/google/devtools/build/lib/bazel/rules/java/java_stub_template.txt
+index df667e4..9cc40e4 100644
+--- a/src/main/java/com/google/devtools/build/lib/bazel/rules/java/java_stub_template.txt
++++ b/src/main/java/com/google/devtools/build/lib/bazel/rules/java/java_stub_template.txt
+@@ -1,4 +1,4 @@
+-#!/bin/bash --posix
++#!/usr/bin/env bash --posix
+ # Copyright 2014 The Bazel Authors. All rights reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/src/main/native/build_windows_jni.sh b/src/main/native/build_windows_jni.sh
+index d10218f..2ffade4 100755
+--- a/src/main/native/build_windows_jni.sh
++++ b/src/main/native/build_windows_jni.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash -eu
++#!/usr/bin/env bash -eu
+ 
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/java/com/google/devtools/build/lib/pkgcache/IncrementalLoadingTest.java b/src/test/java/com/google/devtools/build/lib/pkgcache/IncrementalLoadingTest.java
+index bf49ba0..35e85b2 100644
+--- a/src/test/java/com/google/devtools/build/lib/pkgcache/IncrementalLoadingTest.java
++++ b/src/test/java/com/google/devtools/build/lib/pkgcache/IncrementalLoadingTest.java
+@@ -357,8 +357,8 @@ public class IncrementalLoadingTest {
+   @Test
+   public void testIrrelevantFileInSubdirDoesntReloadPackage() throws Exception {
+     tester.addFile("pkg/BUILD", "sh_library(name = 'pkg', srcs = glob(['**/*.sh']))");
+-    tester.addFile("pkg/pkg.sh", "#!/bin/bash");
+-    tester.addFile("pkg/bar/bar.sh", "#!/bin/bash");
++    tester.addFile("pkg/pkg.sh", "#!/usr/bin/env bash");
++    tester.addFile("pkg/bar/bar.sh", "#!/usr/bin/env bash");
+     Package pkg = tester.getTarget("//pkg:pkg").getPackage();
+ 
+     // Write file in directory to force reload of top-level glob.
+diff --git a/src/test/java/com/google/devtools/build/lib/skylark/SkylarkAspectsTest.java b/src/test/java/com/google/devtools/build/lib/skylark/SkylarkAspectsTest.java
+index c17cd69..9f4009d 100644
+--- a/src/test/java/com/google/devtools/build/lib/skylark/SkylarkAspectsTest.java
++++ b/src/test/java/com/google/devtools/build/lib/skylark/SkylarkAspectsTest.java
+@@ -1067,7 +1067,7 @@ public class SkylarkAspectsTest extends AnalysisTestCase {
+         ")"
+     );
+ 
+-    scratch.file("foo/tool.sh", "#!/bin/bash");
++    scratch.file("foo/tool.sh", "#!/usr/bin/env bash");
+     scratch.file("foo/BUILD",
+         "load('extension',  'my_rule')",
+         "my_rule(name = 'main', exe1 = ':tool.sh', exe2 = ':tool.sh')"
+diff --git a/src/test/shell/bazel/android/android_integration_test.sh b/src/test/shell/bazel/android/android_integration_test.sh
+index 01708e7..37efcc9 100755
+--- a/src/test/shell/bazel/android/android_integration_test.sh
++++ b/src/test/shell/bazel/android/android_integration_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/apple/bazel_apple_test.sh b/src/test/shell/bazel/apple/bazel_apple_test.sh
+index 94c4822..9536e75 100755
+--- a/src/test/shell/bazel/apple/bazel_apple_test.sh
++++ b/src/test/shell/bazel/apple/bazel_apple_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/apple/bazel_objc_test.sh b/src/test/shell/bazel/apple/bazel_objc_test.sh
+index 44cd8cd..f05c22d 100755
+--- a/src/test/shell/bazel/apple/bazel_objc_test.sh
++++ b/src/test/shell/bazel/apple/bazel_objc_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_bootstrap_distfile_test.sh b/src/test/shell/bazel/bazel_bootstrap_distfile_test.sh
+index 8692273..fac6bda 100755
+--- a/src/test/shell/bazel/bazel_bootstrap_distfile_test.sh
++++ b/src/test/shell/bazel/bazel_bootstrap_distfile_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_coverage_test.sh b/src/test/shell/bazel/bazel_coverage_test.sh
+index 4b271ca..d81c0a8 100755
+--- a/src/test/shell/bazel/bazel_coverage_test.sh
++++ b/src/test/shell/bazel/bazel_coverage_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_docgen_test.sh b/src/test/shell/bazel/bazel_docgen_test.sh
+index e17a059..a07e0f3 100755
+--- a/src/test/shell/bazel/bazel_docgen_test.sh
++++ b/src/test/shell/bazel/bazel_docgen_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_example_test.sh b/src/test/shell/bazel/bazel_example_test.sh
+index b28c860..6906c5a 100755
+--- a/src/test/shell/bazel/bazel_example_test.sh
++++ b/src/test/shell/bazel/bazel_example_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_execute_testlog.sh b/src/test/shell/bazel/bazel_execute_testlog.sh
+index 1c3bb95..11042f1 100755
+--- a/src/test/shell/bazel/bazel_execute_testlog.sh
++++ b/src/test/shell/bazel/bazel_execute_testlog.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_java_test.sh b/src/test/shell/bazel/bazel_java_test.sh
+index 77dcf52..e1c5df1 100755
+--- a/src/test/shell/bazel/bazel_java_test.sh
++++ b/src/test/shell/bazel/bazel_java_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_localtest_test.sh b/src/test/shell/bazel/bazel_localtest_test.sh
+index ea592a4..306f7e6 100755
+--- a/src/test/shell/bazel/bazel_localtest_test.sh
++++ b/src/test/shell/bazel/bazel_localtest_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+@@ -28,7 +28,7 @@ function test_run_local() {
+   # In standalone mode,
+   # we have access to /var which is not mounted in sandboxed mode
+   cat <<EOF > dir/test_local.sh
+-#!/bin/bash
++#!/usr/bin/env bash
+ test -e "$(pwd)/emptyfile" && exit 0 || true
+ echo "no $(pwd)/emptyfile in standalone mode"
+ exit 1
+diff --git a/src/test/shell/bazel/bazel_repository_cache_test.sh b/src/test/shell/bazel/bazel_repository_cache_test.sh
+index e503d68..749edaf 100755
+--- a/src/test/shell/bazel/bazel_repository_cache_test.sh
++++ b/src/test/shell/bazel/bazel_repository_cache_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+@@ -142,7 +142,7 @@ filegroup(
+ EOF
+     what_does_the_fox_say="Fraka-kaka-kaka-kaka-kow"
+     cat > fox/male <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ echo $what_does_the_fox_say
+ EOF
+     chmod +x fox/male
+@@ -180,7 +180,7 @@ sh_binary(
+ EOF
+ 
+     cat > zoo/female.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ ../endangered/fox/male
+ EOF
+     chmod +x zoo/female.sh
+diff --git a/src/test/shell/bazel/bazel_rules_test.sh b/src/test/shell/bazel/bazel_rules_test.sh
+index 93bfa41..a7b1df0 100755
+--- a/src/test/shell/bazel/bazel_rules_test.sh
++++ b/src/test/shell/bazel/bazel_rules_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+@@ -63,7 +63,7 @@ function test_extra_action() {
+   # action file. This file is a proto, but I don't want to bother implementing
+   # a program that parses the proto here.
+   cat > mypkg/echoer.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ if [[ ! -e \$0.runfiles/__main__/mypkg/runfile ]]; then
+   echo "Runfile not found" >&2
+   exit 1
+@@ -275,7 +275,7 @@ sh_binary(
+ EOF
+ 
+   cat > package/in.sh << EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ echo "Hi"
+ EOF
+   chmod +x package/in.sh
+diff --git a/src/test/shell/bazel/bazel_sandboxing_cpp_test.sh b/src/test/shell/bazel/bazel_sandboxing_cpp_test.sh
+index 272351d..e60b2f7 100755
+--- a/src/test/shell/bazel/bazel_sandboxing_cpp_test.sh
++++ b/src/test/shell/bazel/bazel_sandboxing_cpp_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_sandboxing_test.sh b/src/test/shell/bazel/bazel_sandboxing_test.sh
+index 4958ecf..671b092 100755
+--- a/src/test/shell/bazel/bazel_sandboxing_test.sh
++++ b/src/test/shell/bazel/bazel_sandboxing_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_sandboxing_test_utils.sh b/src/test/shell/bazel/bazel_sandboxing_test_utils.sh
+index f442ece..db24540 100755
+--- a/src/test/shell/bazel/bazel_sandboxing_test_utils.sh
++++ b/src/test/shell/bazel/bazel_sandboxing_test_utils.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_test_test.sh b/src/test/shell/bazel/bazel_test_test.sh
+index 2a015d4..e10756c 100755
+--- a/src/test/shell/bazel/bazel_test_test.sh
++++ b/src/test/shell/bazel/bazel_test_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+@@ -31,7 +31,7 @@ function set_up_jobcount() {
+   mkdir -p dir
+ 
+   cat <<EOF > dir/test.sh
+-#!/bin/bash
++#!/usr/bin/env bash
+ # hard link
+ z=\$(mktemp -u ${tmp}/tmp.XXXXXXXX)
+ ln ${tmp}/counter \${z}
+@@ -84,7 +84,7 @@ function test_3_local_jobs() {
+ function DISABLED_test_tmpdir() {
+   mkdir -p foo
+   cat > foo/bar_test.sh <<'EOF'
+-#!/bin/bash
++#!/usr/bin/env bash
+ echo TEST_TMPDIR=$TEST_TMPDIR
+ EOF
+   chmod +x foo/bar_test.sh
+@@ -123,7 +123,7 @@ workspace(name = "bar")
+ EOF
+   mkdir -p foo
+   cat > foo/testenv.sh <<'EOF'
+-#!/bin/bash
++#!/usr/bin/env bash
+ echo "pwd: $PWD"
+ echo "src: $TEST_SRCDIR"
+ echo "ws: $TEST_WORKSPACE"
+@@ -249,7 +249,7 @@ function test_runs_per_test_detects_flakes() {
+     # This file holds the number of the next run
+     echo 1 > "${COUNTER_DIR}/$i"
+     cat <<EOF > test$i.sh
+-#!/bin/bash
++#!/usr/bin/env bash
+ i=\$(< "${COUNTER_DIR}/$i")
+ 
+ # increment the hidden state
+diff --git a/src/test/shell/bazel/bazel_toolchain_test.sh b/src/test/shell/bazel/bazel_toolchain_test.sh
+index c3c28d1..a264f34 100755
+--- a/src/test/shell/bazel/bazel_toolchain_test.sh
++++ b/src/test/shell/bazel/bazel_toolchain_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_tools_test.sh b/src/test/shell/bazel/bazel_tools_test.sh
+index 354a6c9..d0ea1b3 100755
+--- a/src/test/shell/bazel/bazel_tools_test.sh
++++ b/src/test/shell/bazel/bazel_tools_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_windows_example_test.sh b/src/test/shell/bazel/bazel_windows_example_test.sh
+index ec5b8f6..7acded1 100755
+--- a/src/test/shell/bazel/bazel_windows_example_test.sh
++++ b/src/test/shell/bazel/bazel_windows_example_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/bazel_workspace_status_test.sh b/src/test/shell/bazel/bazel_workspace_status_test.sh
+index 3823b46..9396fbb 100755
+--- a/src/test/shell/bazel/bazel_workspace_status_test.sh
++++ b/src/test/shell/bazel/bazel_workspace_status_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+@@ -25,11 +25,11 @@ function test_workspace_status_invalidation() {
+   local ok=$TEST_TMPDIR/ok.sh
+   local bad=$TEST_TMPDIR/bad.sh
+   cat > $ok <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ exit 0
+ EOF
+   cat >$bad <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ exit 1
+ EOF
+   chmod +x $ok $bad
+@@ -50,7 +50,7 @@ function test_workspace_status_parameters() {
+ 
+   local cmd=$TEST_TMPDIR/status.sh
+   cat > $cmd <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ echo BUILD_SCM_STATUS funky
+ EOF
+@@ -76,7 +76,7 @@ function test_workspace_status_cpp() {
+ 
+   local cmd=$TEST_TMPDIR/status.sh
+   cat > $cmd <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ echo BUILD_SCM_STATUS funky
+ EOF
+@@ -118,7 +118,7 @@ EOF
+ function test_stable_and_volatile_status() {
+   create_new_workspace
+   cat >$TEST_TMPDIR/wsc.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ cat $TEST_TMPDIR/status
+ EOF
+diff --git a/src/test/shell/bazel/bound_targets_test.sh b/src/test/shell/bazel/bound_targets_test.sh
+index d7da26a..6b43673 100755
+--- a/src/test/shell/bazel/bound_targets_test.sh
++++ b/src/test/shell/bazel/bound_targets_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/build_files_test.sh b/src/test/shell/bazel/build_files_test.sh
+index c6756f5..a5cbc76 100755
+--- a/src/test/shell/bazel/build_files_test.sh
++++ b/src/test/shell/bazel/build_files_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/cc_inc_library_test.sh b/src/test/shell/bazel/cc_inc_library_test.sh
+index 6d13c80..96a505a 100755
+--- a/src/test/shell/bazel/cc_inc_library_test.sh
++++ b/src/test/shell/bazel/cc_inc_library_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/client_test.sh b/src/test/shell/bazel/client_test.sh
+index e3eb6f5..51bc905 100755
+--- a/src/test/shell/bazel/client_test.sh
++++ b/src/test/shell/bazel/client_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/src/test/shell/bazel/cross_repository_test.sh b/src/test/shell/bazel/cross_repository_test.sh
+index b484437..d9f6ce8 100755
+--- a/src/test/shell/bazel/cross_repository_test.sh
++++ b/src/test/shell/bazel/cross_repository_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/empty_package.sh b/src/test/shell/bazel/empty_package.sh
+index d647652..7cdce02 100755
+--- a/src/test/shell/bazel/empty_package.sh
++++ b/src/test/shell/bazel/empty_package.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/execroot_test.sh b/src/test/shell/bazel/execroot_test.sh
+index 4f64e09..0254e1f 100755
+--- a/src/test/shell/bazel/execroot_test.sh
++++ b/src/test/shell/bazel/execroot_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/external_correctness_test.sh b/src/test/shell/bazel/external_correctness_test.sh
+index ea8ad05..beb91b0 100755
+--- a/src/test/shell/bazel/external_correctness_test.sh
++++ b/src/test/shell/bazel/external_correctness_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/external_integration_test.sh b/src/test/shell/bazel/external_integration_test.sh
+index 21d5c0d..b0888cd 100755
+--- a/src/test/shell/bazel/external_integration_test.sh
++++ b/src/test/shell/bazel/external_integration_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+@@ -100,7 +100,7 @@ filegroup(
+ EOF
+     what_does_the_fox_say="Fraka-kaka-kaka-kaka-kow"
+     cat > fox/male <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ echo $what_does_the_fox_say
+ EOF
+     chmod +x fox/male
+@@ -135,7 +135,7 @@ sh_binary(
+ EOF
+ 
+     cat > zoo/female.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ ../endangered/fox/male
+ EOF
+     chmod +x zoo/female.sh
+@@ -215,7 +215,7 @@ sh_binary(
+ EOF
+ 
+   cat > zoo/female.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ cat fox/male
+ EOF
+   chmod +x zoo/female.sh
+@@ -254,7 +254,7 @@ sh_binary(
+ EOF
+ 
+   cat > zoo/female.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ cat fox/male
+ EOF
+   chmod +x zoo/female.sh
+@@ -387,7 +387,7 @@ EOF
+ function test_http_download() {
+   local test_file=$TEST_TMPDIR/toto
+   cat > $test_file <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ echo "Tra-la!"
+ EOF
+   local sha256=$(sha256sum $test_file | cut -f 1 -d ' ')
+@@ -409,7 +409,7 @@ sh_binary(
+ EOF
+ 
+   cat > test/test.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ echo "symlink:"
+ ls -l ../toto/file
+ echo "dest:"
+@@ -447,7 +447,7 @@ sh_binary(
+ EOF
+ 
+   cat > test/test.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ cat ../toto/file/toto
+ EOF
+ 
+@@ -569,7 +569,7 @@ sh_binary(
+ EOF
+ 
+   cat > zoo/female.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ cat ../endangered/fox/male
+ EOF
+   chmod +x zoo/female.sh
+diff --git a/src/test/shell/bazel/external_skylark_load_test.sh b/src/test/shell/bazel/external_skylark_load_test.sh
+index 6c503f1..23a8281 100755
+--- a/src/test/shell/bazel/external_skylark_load_test.sh
++++ b/src/test/shell/bazel/external_skylark_load_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/generate_workspace_test.sh b/src/test/shell/bazel/generate_workspace_test.sh
+index f7638fe..943050c 100755
+--- a/src/test/shell/bazel/generate_workspace_test.sh
++++ b/src/test/shell/bazel/generate_workspace_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/git_repository_test.sh b/src/test/shell/bazel/git_repository_test.sh
+index 033a683..9b02750 100755
+--- a/src/test/shell/bazel/git_repository_test.sh
++++ b/src/test/shell/bazel/git_repository_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+@@ -85,7 +85,7 @@ sh_binary(
+ EOF
+ 
+   cat > planets/planet_info.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ cat ../pluto/info
+ EOF
+   chmod +x planets/planet_info.sh
+@@ -171,7 +171,7 @@ sh_binary(
+ EOF
+ 
+   cat > planets/planet_info.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ cat ../pluto/info
+ EOF
+   chmod +x planets/planet_info.sh
+@@ -246,7 +246,7 @@ sh_binary(
+ EOF
+ 
+   cat > planets/planet_info.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ cat ../outer_planets/neptune/info
+ cat ../outer_planets/pluto/info
+ EOF
+@@ -351,7 +351,7 @@ function setup_error_test() {
+   cd $WORKSPACE_DIR
+   mkdir -p planets
+   cat > planets/planet_info.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ cat external/pluto/info
+ EOF
+ 
+diff --git a/src/test/shell/bazel/help_test.sh b/src/test/shell/bazel/help_test.sh
+index 3e25703..bca3885 100755
+--- a/src/test/shell/bazel/help_test.sh
++++ b/src/test/shell/bazel/help_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/linux-sandbox_test.sh b/src/test/shell/bazel/linux-sandbox_test.sh
+index c97f190..f55a534 100755
+--- a/src/test/shell/bazel/linux-sandbox_test.sh
++++ b/src/test/shell/bazel/linux-sandbox_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/local_repository_test.sh b/src/test/shell/bazel/local_repository_test.sh
+index 851911c..edf923d 100755
+--- a/src/test/shell/bazel/local_repository_test.sh
++++ b/src/test/shell/bazel/local_repository_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+@@ -95,7 +95,7 @@ sh_binary(
+ EOF
+ 
+   cat > zoo/dumper.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ cat ../pandas/red/baby-panda
+ cat red/day-keeper
+ EOF
+diff --git a/src/test/shell/bazel/local_repository_test_jdk8.sh b/src/test/shell/bazel/local_repository_test_jdk8.sh
+index 469d402..b7d3500 100755
+--- a/src/test/shell/bazel/local_repository_test_jdk8.sh
++++ b/src/test/shell/bazel/local_repository_test_jdk8.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/location_test.sh b/src/test/shell/bazel/location_test.sh
+index 801aa19..92da1fc 100755
+--- a/src/test/shell/bazel/location_test.sh
++++ b/src/test/shell/bazel/location_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/maven_skylark_test.sh b/src/test/shell/bazel/maven_skylark_test.sh
+index 3b5a496..757768d 100755
+--- a/src/test/shell/bazel/maven_skylark_test.sh
++++ b/src/test/shell/bazel/maven_skylark_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/maven_test.sh b/src/test/shell/bazel/maven_test.sh
+index 3e50d6d..2fbfee1 100755
+--- a/src/test/shell/bazel/maven_test.sh
++++ b/src/test/shell/bazel/maven_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/persistent_test_runner_test.sh b/src/test/shell/bazel/persistent_test_runner_test.sh
+index 95980ed..93b2b98 100755
+--- a/src/test/shell/bazel/persistent_test_runner_test.sh
++++ b/src/test/shell/bazel/persistent_test_runner_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/process-wrapper_test.sh b/src/test/shell/bazel/process-wrapper_test.sh
+index b720ab8..b126af2 100755
+--- a/src/test/shell/bazel/process-wrapper_test.sh
++++ b/src/test/shell/bazel/process-wrapper_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/remote_execution_test.sh b/src/test/shell/bazel/remote_execution_test.sh
+index 897bdbb..331dafb 100755
+--- a/src/test/shell/bazel/remote_execution_test.sh
++++ b/src/test/shell/bazel/remote_execution_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/remote_helpers.sh b/src/test/shell/bazel/remote_helpers.sh
+index ab8dbd5..dfffc0f 100755
+--- a/src/test/shell/bazel/remote_helpers.sh
++++ b/src/test/shell/bazel/remote_helpers.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/rule_test_test.sh b/src/test/shell/bazel/rule_test_test.sh
+index 09c0add..ac89a00 100755
+--- a/src/test/shell/bazel/rule_test_test.sh
++++ b/src/test/shell/bazel/rule_test_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/runfiles_test.sh b/src/test/shell/bazel/runfiles_test.sh
+index e0ac79b..5d08097 100755
+--- a/src/test/shell/bazel/runfiles_test.sh
++++ b/src/test/shell/bazel/runfiles_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/bazel/skylark_repository_test.sh b/src/test/shell/bazel/skylark_repository_test.sh
+index 58151d1..bf96ea4 100755
+--- a/src/test/shell/bazel/skylark_repository_test.sh
++++ b/src/test/shell/bazel/skylark_repository_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+@@ -311,7 +311,7 @@ function test_skylark_repository_which_and_execute() {
+ 
+   # Test we are using the client environment, not the server one
+   bazel info &> /dev/null  # Start up the server.
+-  echo "#!/bin/bash" > bin.sh
++  echo "#!/usr/bin/env bash" > bin.sh
+   echo "exit 0" >> bin.sh
+   chmod +x bin.sh
+ 
+diff --git a/src/test/shell/bazel/workspace_test.sh b/src/test/shell/bazel/workspace_test.sh
+index a319cbb..ee1f46d 100755
+--- a/src/test/shell/bazel/workspace_test.sh
++++ b/src/test/shell/bazel/workspace_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/action_env_test.sh b/src/test/shell/integration/action_env_test.sh
+index 2564a5a..e344a8f 100755
+--- a/src/test/shell/integration/action_env_test.sh
++++ b/src/test/shell/integration/action_env_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/bazel_command_log_test.sh b/src/test/shell/integration/bazel_command_log_test.sh
+index 1955908..0cd08e8 100755
+--- a/src/test/shell/integration/bazel_command_log_test.sh
++++ b/src/test/shell/integration/bazel_command_log_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/bazel_javabase_test.sh b/src/test/shell/integration/bazel_javabase_test.sh
+index fecf82c..cb658ab 100755
+--- a/src/test/shell/integration/bazel_javabase_test.sh
++++ b/src/test/shell/integration/bazel_javabase_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/src/test/shell/integration/bazel_query_test.sh b/src/test/shell/integration/bazel_query_test.sh
+index b009adb..b903295 100755
+--- a/src/test/shell/integration/bazel_query_test.sh
++++ b/src/test/shell/integration/bazel_query_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/bazel_testjobs_test.sh b/src/test/shell/integration/bazel_testjobs_test.sh
+index 2c6f99c..581cdce 100755
+--- a/src/test/shell/integration/bazel_testjobs_test.sh
++++ b/src/test/shell/integration/bazel_testjobs_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/bazel_worker_test.sh b/src/test/shell/integration/bazel_worker_test.sh
+index 424d4fd..3b9727e 100755
+--- a/src/test/shell/integration/bazel_worker_test.sh
++++ b/src/test/shell/integration/bazel_worker_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/build_event_stream_test.sh b/src/test/shell/integration/build_event_stream_test.sh
+index e26d627..47c279d 100755
+--- a/src/test/shell/integration/build_event_stream_test.sh
++++ b/src/test/shell/integration/build_event_stream_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/client_sigint_test.sh b/src/test/shell/integration/client_sigint_test.sh
+index 88d9ad9..70a9ffb 100755
+--- a/src/test/shell/integration/client_sigint_test.sh
++++ b/src/test/shell/integration/client_sigint_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/discard_analysis_cache_test.sh b/src/test/shell/integration/discard_analysis_cache_test.sh
+index 9ba865a..4f7b1ae 100755
+--- a/src/test/shell/integration/discard_analysis_cache_test.sh
++++ b/src/test/shell/integration/discard_analysis_cache_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/discard_graph_edges_test.sh b/src/test/shell/integration/discard_graph_edges_test.sh
+index 472d8da..d21b623 100755
+--- a/src/test/shell/integration/discard_graph_edges_test.sh
++++ b/src/test/shell/integration/discard_graph_edges_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/experimental_ui_test.sh b/src/test/shell/integration/experimental_ui_test.sh
+index e3265a7..fa1066c 100755
+--- a/src/test/shell/integration/experimental_ui_test.sh
++++ b/src/test/shell/integration/experimental_ui_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/force_delete_output_test.sh b/src/test/shell/integration/force_delete_output_test.sh
+index 9b6fbd8..1ff8d12 100755
+--- a/src/test/shell/integration/force_delete_output_test.sh
++++ b/src/test/shell/integration/force_delete_output_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/ide_info_generation.sh b/src/test/shell/integration/ide_info_generation.sh
+index b860f42..7e39672 100755
+--- a/src/test/shell/integration/ide_info_generation.sh
++++ b/src/test/shell/integration/ide_info_generation.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/java_integration_test.sh b/src/test/shell/integration/java_integration_test.sh
+index e86e90a..2e824ba 100755
+--- a/src/test/shell/integration/java_integration_test.sh
++++ b/src/test/shell/integration/java_integration_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/loading_phase_tests.sh b/src/test/shell/integration/loading_phase_tests.sh
+index cba257a..fa1f9ec 100755
+--- a/src/test/shell/integration/loading_phase_tests.sh
++++ b/src/test/shell/integration/loading_phase_tests.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/output_filter_test.sh b/src/test/shell/integration/output_filter_test.sh
+index 588183e..c78d39e 100755
+--- a/src/test/shell/integration/output_filter_test.sh
++++ b/src/test/shell/integration/output_filter_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+@@ -127,7 +127,7 @@ sh_test(name='test',
+ EOF
+ 
+   cat >foo/bar/test.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ exit 0
+ EOF
+ 
+@@ -225,13 +225,13 @@ sh_test(name='hummingbird', srcs=['hummingbird.sh'])
+ EOF
+ 
+   cat >geflugel/mockingbird.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ echo "To kill -9 a mockingbird"
+ exit 1
+ EOF
+ 
+   cat >geflugel/hummingbird.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ echo "To kill -9 a hummingbird"
+ exit 1
+ EOF
+diff --git a/src/test/shell/integration/progress_reporting_test.sh b/src/test/shell/integration/progress_reporting_test.sh
+index f84b61a..fca4fe4 100755
+--- a/src/test/shell/integration/progress_reporting_test.sh
++++ b/src/test/shell/integration/progress_reporting_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+@@ -148,7 +148,7 @@ EOF
+   # implementation to have a progress message, because it breaks all kinds of
+   # things.
+   cat >"${pkg}/workspace_status.sh" <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ sleep 5
+ EOF
+ 
+diff --git a/src/test/shell/integration/rc_options_test.sh b/src/test/shell/integration/rc_options_test.sh
+index c9aeb88..2150a9a 100755
+--- a/src/test/shell/integration/rc_options_test.sh
++++ b/src/test/shell/integration/rc_options_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/run_test.sh b/src/test/shell/integration/run_test.sh
+index ce39bdb..cedefea 100755
+--- a/src/test/shell/integration/run_test.sh
++++ b/src/test/shell/integration/run_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+@@ -176,7 +176,7 @@ function test_interrupt_kills_child() {
+   rm -f /tmp/sleep-minute-pipe
+   mkfifo /tmp/sleep-minute-pipe || fail "make pipe failed"
+   echo 'sh_binary(name = "sleep-minute", srcs = ["sleep-minute.sh"])' > foo/BUILD
+-  echo -e "#!/bin/bash\n"'echo $$ >/tmp/sleep-minute-pipe'"\n"'sleep 60' > foo/sleep-minute.sh
++  echo -e "#!/usr/bin/env bash\n"'echo $$ >/tmp/sleep-minute-pipe'"\n"'sleep 60' > foo/sleep-minute.sh
+   chmod +x foo/sleep-minute.sh
+   # Note that if bazel info is not executed before the actual bazel run, this script would have to
+   # be run in "monitor mode" (with the command set -m) for bazel or the server to receive SIGINT.
+@@ -292,7 +292,7 @@ sh_binary(
+ EOF
+ 
+   cat > some/testing/test.sh <<'EOF'
+-#!/bin/bash
++#!/usr/bin/env bash
+ set -ex
+ echo "Got $@"
+ i=1
+@@ -318,7 +318,7 @@ alias(name='b', actual='a')
+ EOF
+ 
+   cat > a/a.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ echo "Dancing with wolves"
+ exit 0
+ EOF
+diff --git a/src/test/shell/integration/runfiles_test.sh b/src/test/shell/integration/runfiles_test.sh
+index ef1faf0..9185508 100755
+--- a/src/test/shell/integration/runfiles_test.sh
++++ b/src/test/shell/integration/runfiles_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/startup_options_test.sh b/src/test/shell/integration/startup_options_test.sh
+index 35fd784..5f7f70c 100755
+--- a/src/test/shell/integration/startup_options_test.sh
++++ b/src/test/shell/integration/startup_options_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration/stub_finds_runfiles_test.sh b/src/test/shell/integration/stub_finds_runfiles_test.sh
+index a608625..41f19ff 100755
+--- a/src/test/shell/integration/stub_finds_runfiles_test.sh
++++ b/src/test/shell/integration/stub_finds_runfiles_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+@@ -76,19 +76,19 @@ EOF
+ touch pkg/pybin.py
+ touch pkg/pytest.py
+ cat > pkg/sh_runs_javabin.sh << 'EOF'
+-#!/bin/bash
++#!/usr/bin/env bash
+ exec $0.runfiles/*/pkg/javabin
+ EOF
+ cat > pkg/sh_runs_javatest.sh << 'EOF'
+-#!/bin/bash
++#!/usr/bin/env bash
+ exec $TEST_SRCDIR/*/pkg/javatest
+ EOF
+ cat > pkg/sh_runs_pybin.sh << 'EOF'
+-#!/bin/bash
++#!/usr/bin/env bash
+ exec $0.runfiles/*/pkg/pybin
+ EOF
+ cat > pkg/sh_runs_pytest.sh << 'EOF'
+-#!/bin/bash
++#!/usr/bin/env bash
+ exec $TEST_SRCDIR/*/pkg/pytest
+ EOF
+ chmod +x pkg/*.sh
+diff --git a/src/test/shell/integration/ui_test.sh b/src/test/shell/integration/ui_test.sh
+index c3651cd..f1c68cc 100755
+--- a/src/test/shell/integration/ui_test.sh
++++ b/src/test/shell/integration/ui_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/integration_test_setup.sh b/src/test/shell/integration_test_setup.sh
+index 73f7c92..887b409 100755
+--- a/src/test/shell/integration_test_setup.sh
++++ b/src/test/shell/integration_test_setup.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/shell_utils.sh b/src/test/shell/shell_utils.sh
+index 0961268..fe92d19 100755
+--- a/src/test/shell/shell_utils.sh
++++ b/src/test/shell/shell_utils.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/shell_utils_test.sh b/src/test/shell/shell_utils_test.sh
+index 7e29830..42560fb 100755
+--- a/src/test/shell/shell_utils_test.sh
++++ b/src/test/shell/shell_utils_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/testenv.sh b/src/test/shell/testenv.sh
+index 264f32a..34b95c6 100755
+--- a/src/test/shell/testenv.sh
++++ b/src/test/shell/testenv.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/test/shell/unittest_test.sh b/src/test/shell/unittest_test.sh
+index 2799aad..a22d5db 100755
+--- a/src/test/shell/unittest_test.sh
++++ b/src/test/shell/unittest_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+@@ -49,7 +49,7 @@ function test_timestamp() {
+ function test_failure_message() {
+   cd $TEST_TMPDIR
+   cat > thing.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ XML_OUTPUT_FILE=${TEST_TMPDIR}/dummy.xml
+ source ${DIR}/unittest.bash
+ 
+@@ -69,7 +69,7 @@ EOF
+ function test_no_failure_message() {
+   cd $TEST_TMPDIR
+   cat > thing.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ XML_OUTPUT_FILE=${TEST_TMPDIR}/dummy.xml
+ source ${DIR}/unittest.bash
+ 
+@@ -88,7 +88,7 @@ EOF
+ function test_errexit_prints_stack_trace() {
+   cd $TEST_TMPDIR
+   cat > thing.sh <<EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ XML_OUTPUT_FILE=${TEST_TMPDIR}/dummy.xml
+ source ${DIR}/unittest.bash
+ 
+diff --git a/src/tools/singlejar/output_jar_shell_test.sh b/src/tools/singlejar/output_jar_shell_test.sh
+index f4b334c..e43b068 100755
+--- a/src/tools/singlejar/output_jar_shell_test.sh
++++ b/src/tools/singlejar/output_jar_shell_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+@@ -43,5 +43,5 @@ function test_new_entries() {
+ }
+ 
+ run_suite "Misc shell tests"
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+diff --git a/src/tools/singlejar/zip64_test.sh b/src/tools/singlejar/zip64_test.sh
+index 3986ed0..4aefb70 100755
+--- a/src/tools/singlejar/zip64_test.sh
++++ b/src/tools/singlejar/zip64_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/tools/xcode/actoolwrapper/actoolwrapper.sh b/src/tools/xcode/actoolwrapper/actoolwrapper.sh
+index 1a55ac1..92e122b 100755
+--- a/src/tools/xcode/actoolwrapper/actoolwrapper.sh
++++ b/src/tools/xcode/actoolwrapper/actoolwrapper.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/tools/xcode/environment/environment_plist.sh b/src/tools/xcode/environment/environment_plist.sh
+index 057a9c8..0c09bfa 100755
+--- a/src/tools/xcode/environment/environment_plist.sh
++++ b/src/tools/xcode/environment/environment_plist.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/src/tools/xcode/ibtoolwrapper/ibtoolwrapper.sh b/src/tools/xcode/ibtoolwrapper/ibtoolwrapper.sh
+index be72527..8938587 100755
+--- a/src/tools/xcode/ibtoolwrapper/ibtoolwrapper.sh
++++ b/src/tools/xcode/ibtoolwrapper/ibtoolwrapper.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/tools/xcode/libtool/libtool.sh b/src/tools/xcode/libtool/libtool.sh
+index 5ad89a0..61a941c 100755
+--- a/src/tools/xcode/libtool/libtool.sh
++++ b/src/tools/xcode/libtool/libtool.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/tools/xcode/momcwrapper/momcwrapper.sh b/src/tools/xcode/momcwrapper/momcwrapper.sh
+index 04c9e24..0aad070 100755
+--- a/src/tools/xcode/momcwrapper/momcwrapper.sh
++++ b/src/tools/xcode/momcwrapper/momcwrapper.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/tools/xcode/swiftstdlibtoolwrapper/swiftstdlibtoolwrapper.sh b/src/tools/xcode/swiftstdlibtoolwrapper/swiftstdlibtoolwrapper.sh
+index 99c9205..b76c1b1 100755
+--- a/src/tools/xcode/swiftstdlibtoolwrapper/swiftstdlibtoolwrapper.sh
++++ b/src/tools/xcode/swiftstdlibtoolwrapper/swiftstdlibtoolwrapper.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/src/tools/xcode/xcrunwrapper/xcrunwrapper.sh b/src/tools/xcode/xcrunwrapper/xcrunwrapper.sh
+index 7b27bf5..e01c439 100755
+--- a/src/tools/xcode/xcrunwrapper/xcrunwrapper.sh
++++ b/src/tools/xcode/xcrunwrapper/xcrunwrapper.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/third_party/ijar/test/ijar_test.sh b/third_party/ijar/test/ijar_test.sh
+index 0b9a92f..81f3668 100755
+--- a/third_party/ijar/test/ijar_test.sh
++++ b/third_party/ijar/test/ijar_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash -eu
++#!/usr/bin/env bash -eu
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/third_party/ijar/test/testenv.sh b/third_party/ijar/test/testenv.sh
+index 235f2c5..cda7893 100755
+--- a/third_party/ijar/test/testenv.sh
++++ b/third_party/ijar/test/testenv.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/third_party/ijar/test/zip_test.sh b/third_party/ijar/test/zip_test.sh
+index d206a74..006a5b3 100755
+--- a/third_party/ijar/test/zip_test.sh
++++ b/third_party/ijar/test/zip_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash -eu
++#!/usr/bin/env bash -eu
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/third_party/nanopb/tools/make_linux_package.sh b/third_party/nanopb/tools/make_linux_package.sh
+index 6598936..655b70d 100755
+--- a/third_party/nanopb/tools/make_linux_package.sh
++++ b/third_party/nanopb/tools/make_linux_package.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Run this script in the top nanopb directory to create a binary package
+ # for Linux users.
+@@ -34,7 +34,7 @@ LIBPROTOC=$(ldd `which protoc` | grep -o '/.*libprotoc[^ ]*')
+ LIBPROTOBUF=$(ldd `which protoc` | grep -o '/.*libprotobuf[^ ]*')
+ cp $LIBPROTOC $LIBPROTOBUF $DEST/generator-bin/
+ cat > $DEST/generator-bin/protoc << EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ SCRIPTDIR=\$(dirname "\$0")
+ export LD_LIBRARY_PATH=\$SCRIPTDIR
+ export PATH=\$SCRIPTDIR:\$PATH
+diff --git a/third_party/nanopb/tools/make_mac_package.sh b/third_party/nanopb/tools/make_mac_package.sh
+index 32bba5c..8961d0c 100755
+--- a/third_party/nanopb/tools/make_mac_package.sh
++++ b/third_party/nanopb/tools/make_mac_package.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Run this script in the top nanopb directory to create a binary package
+ # for Mac OS X users.
+@@ -36,7 +36,7 @@ LIBPROTOC=$(otool -L `which protoc` | grep -o '/.*libprotoc[^ ]*')
+ LIBPROTOBUF=$(otool -L `which protoc` | grep -o '/.*libprotobuf[^ ]*')
+ cp $LIBPROTOC $LIBPROTOBUF $DEST/generator-bin/
+ cat > $DEST/generator-bin/protoc << EOF
+-#!/bin/bash
++#!/usr/bin/env bash
+ SCRIPTDIR=\$(dirname "\$0")
+ export DYLD_LIBRARY_PATH=\$SCRIPTDIR
+ export PATH=\$SCRIPTDIR:\$PATH
+diff --git a/third_party/nanopb/tools/make_windows_package.sh b/third_party/nanopb/tools/make_windows_package.sh
+index 72de6f3..2dae79f 100755
+--- a/third_party/nanopb/tools/make_windows_package.sh
++++ b/third_party/nanopb/tools/make_windows_package.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Run this script in the top nanopb directory to create a binary package
+ # for Windows users. This script is designed to run under MingW/MSYS bash
+diff --git a/third_party/nanopb/tools/set_version.sh b/third_party/nanopb/tools/set_version.sh
+index e15a859..cd35084 100755
+--- a/third_party/nanopb/tools/set_version.sh
++++ b/third_party/nanopb/tools/set_version.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Run this from the top directory of nanopb tree.
+ # e.g. user@localhost:~/nanopb$ tools/set_version.sh nanopb-0.1.9-dev
+diff --git a/tools/android/fail.sh b/tools/android/fail.sh
+index bddb4a9..e92085a 100755
+--- a/tools/android/fail.sh
++++ b/tools/android/fail.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/tools/android/jack/fail.sh b/tools/android/jack/fail.sh
+index c308f5f..61532c3 100755
+--- a/tools/android/jack/fail.sh
++++ b/tools/android/jack/fail.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/tools/android/zip_manifest_creator.sh b/tools/android/zip_manifest_creator.sh
+index b421f32..6953f1d 100755
+--- a/tools/android/zip_manifest_creator.sh
++++ b/tools/android/zip_manifest_creator.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/android/zip_manifest_creator_test.sh b/tools/android/zip_manifest_creator_test.sh
+index d102b1a..85aae3b 100755
+--- a/tools/android/zip_manifest_creator_test.sh
++++ b/tools/android/zip_manifest_creator_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/build_defs/docker/build_test.sh b/tools/build_defs/docker/build_test.sh
+index 82df66b..b1d74a1 100755
+--- a/tools/build_defs/docker/build_test.sh
++++ b/tools/build_defs/docker/build_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/build_defs/docker/build_test_oci.sh b/tools/build_defs/docker/build_test_oci.sh
+index fd7e73b..337afb0 100755
+--- a/tools/build_defs/docker/build_test_oci.sh
++++ b/tools/build_defs/docker/build_test_oci.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/build_defs/docker/testenv.sh b/tools/build_defs/docker/testenv.sh
+index 6840ad0..121c59c 100755
+--- a/tools/build_defs/docker/testenv.sh
++++ b/tools/build_defs/docker/testenv.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/build_defs/pkg/build_test.sh b/tools/build_defs/pkg/build_test.sh
+index b4c3b16..750fa65 100755
+--- a/tools/build_defs/pkg/build_test.sh
++++ b/tools/build_defs/pkg/build_test.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/build_defs/pkg/testenv.sh b/tools/build_defs/pkg/testenv.sh
+index b0a6340..e438eb8 100755
+--- a/tools/build_defs/pkg/testenv.sh
++++ b/tools/build_defs/pkg/testenv.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/coverage/collect-coverage.sh b/tools/coverage/collect-coverage.sh
+index 85875c0..a7e359c 100755
+--- a/tools/coverage/collect-coverage.sh
++++ b/tools/coverage/collect-coverage.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/cpp/link_dynamic_library.sh b/tools/cpp/link_dynamic_library.sh
+index ae79a80..ff985c9 100755
+--- a/tools/cpp/link_dynamic_library.sh
++++ b/tools/cpp/link_dynamic_library.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/cpp/osx_cc_wrapper.sh b/tools/cpp/osx_cc_wrapper.sh
+index 739fca5..cab6f8d 100755
+--- a/tools/cpp/osx_cc_wrapper.sh
++++ b/tools/cpp/osx_cc_wrapper.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/objc/protobuf_compiler_wrapper.sh b/tools/objc/protobuf_compiler_wrapper.sh
+index cf20603..f336c0c 100755
+--- a/tools/objc/protobuf_compiler_wrapper.sh
++++ b/tools/objc/protobuf_compiler_wrapper.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/tools/osx/xcode_locator_stub.sh b/tools/osx/xcode_locator_stub.sh
+index 33191c9..1d033ea 100755
+--- a/tools/osx/xcode_locator_stub.sh
++++ b/tools/osx/xcode_locator_stub.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/python/2to3.sh b/tools/python/2to3.sh
+index d87f29e..f019ff9 100755
+--- a/tools/python/2to3.sh
++++ b/tools/python/2to3.sh
+@@ -1,3 +1,3 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ exit 1
+diff --git a/tools/test/collect_coverage.sh b/tools/test/collect_coverage.sh
+index 33aa2e3..e2128fd 100755
+--- a/tools/test/collect_coverage.sh
++++ b/tools/test/collect_coverage.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2016 The Bazel Authors. All rights reserved.
+ #
+diff --git a/tools/test/test-setup.sh b/tools/test/test-setup.sh
+index 47666d6..0d83ac2 100755
+--- a/tools/test/test-setup.sh
++++ b/tools/test/test-setup.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ # Copyright 2015 The Bazel Authors. All rights reserved.
+ #
+-- 
+2.10.0
+
