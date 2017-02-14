@@ -26,6 +26,7 @@ rust_library(
 rust_test(
     name = "lite_tests",
     srcs = glob(["test/**/*.rs"]),
+    size = "small",
     deps = [
       ":lite",
       ":lite_proto",

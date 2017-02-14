@@ -42,6 +42,5 @@ fn main() {
   let mut hotloader = Hotloader::<BasicProxy>::new(dylib_path, matches);
   loop {
     hotloader.get_proxy().unwrap().run();
-    thread::sleep(Duration::from_millis(200));
   }
 }

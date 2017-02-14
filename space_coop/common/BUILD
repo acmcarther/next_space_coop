@@ -12,4 +12,15 @@ load("//tools/bazel/proto:rust.bzl", "rust_proto_library")
 rust_proto_library(
     name = "network_proto",
     protos = ["network.proto"],
+    proto_deps = [
+        ":game_proto",
+    ],
+    proto_dep_crates = [
+        "game_proto",
+    ],
+)
+
+rust_proto_library(
+    name = "game_proto",
+    protos = ["game.proto"],
 )

@@ -1,12 +1,14 @@
 extern crate state_proto;
 extern crate lite;
 extern crate network_proto;
+extern crate game_proto;
 extern crate libc;
 extern crate clap;
 extern crate protobuf;
 extern crate gaffer_udp;
 extern crate fern;
 extern crate time;
+extern crate rand;
 extern crate itertools;
 #[macro_use]
 extern crate loadable;
@@ -18,6 +20,8 @@ extern crate lazy_static;
 extern crate log;
 
 mod game;
+mod lobby;
+mod gameplay;
 
 use loadable::SnapshottedGame;
 use game::State;

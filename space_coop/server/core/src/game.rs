@@ -1,22 +1,29 @@
 use clap::ArgMatches;
-use network_proto::network::ClientMessage;
-use network_proto::network::ClientMessage_MessageType;
-use network_proto::network::ServerMessage;
-use network_proto::network::ServerMessage_MessageType;
-use state_proto::state::NetworkPlayer;
-use protobuf;
-use loadable::Game;
-use protobuf::Message;
-use protobuf::RepeatedField;
-use time::PreciseTime;
+use gameplay::Gameplay;
 use itertools::Itertools;
-use std::collections::HashMap;
-use std::net::SocketAddr;
-use std::str::FromStr;
-use gaffer_udp::packet::GafferPacket;
 use lite::LiteServer;
 use lite::LiteServerEvent;
 use lite;
+use protobuf::Message;
+use loadable::Game;
+use lobby::Lobby;
+use game_proto::game::PlayerLike;
+use game_proto::game::Snapshot;
+use network_proto::network::ClientMessage;
+use network_proto::network::ServerMessage;
+use network_proto::network::ServerMessage_MessageType;
+use protobuf;
+use protobuf::RepeatedField;
+use game_proto::game::GameMode;
+use state_proto::state::NetworkPlayer;
+use state_proto::state::Mailbox;
+use state_proto::state::PlayerData;
+use std::collections::HashMap;
+use std::collections::HashSet;
+use std::str::FromStr;
+use std::thread;
+use time::Duration;
+use time::SteadyTime;
 
 /**
  * The exported type that is passed unmodified between loads
@@ -32,43 +39,165 @@ pub type Transient = LiteServer;
  */
 pub use state_proto::state::State;
 
+pub const SIM_TARGET_TICKRATE: u32 = 100;
+pub const NET_TARGET_TICKRATE: u32 = 1000;
+
+lazy_static! {
+  static ref SIM_INTERVAL_US: Duration =
+    Duration::nanoseconds((1000000000.0 * (1.0 / SIM_TARGET_TICKRATE as f64)) as i64);
+  static ref NET_INTERVAL_US: Duration =
+    Duration::nanoseconds((1000000000.0 * (1.0 / NET_TARGET_TICKRATE as f64)) as i64);
+}
+
 pub struct RunningGame {
   state: State,
   network: LiteServer,
-  last_run_time: PreciseTime,
+  last_sim_time: SteadyTime,
+  last_net_time: SteadyTime,
+  next_sim_time: SteadyTime,
+  next_net_time: SteadyTime,
 }
 
 impl RunningGame {
-  fn new(mut state: State, network: LiteServer) -> RunningGame {
+  fn new(state: State, network: LiteServer) -> RunningGame {
     trace!("Hotloading with: {:?}", state);
     RunningGame {
       state: state,
       network: network,
-      last_run_time: PreciseTime::now(),
+      last_sim_time: SteadyTime::now(),
+      last_net_time: SteadyTime::now(),
+      next_sim_time: SteadyTime::now(),
+      next_net_time: SteadyTime::now(),
     }
   }
 
   fn update_network_state(&mut self) {
-    let mut outgoing_msgs = Vec::new();
     let mut incoming_msgs = self.network.read();
 
     while !incoming_msgs.is_empty() {
-      outgoing_msgs.extend(self.process_messages(incoming_msgs));
+      self.process_messages(incoming_msgs);
       incoming_msgs = self.network.read();
     }
+    let player_likes = self.produce_playerlikes();
+    let network = &mut self.network;
 
-    outgoing_msgs.into_iter().foreach(|(client_id, msg)| {
-      match self.network.write(client_id, msg) {
-        lite::WriteResult::Success => {},
-        lite::WriteResult::Failure_NotConnected => {
-          trace!("Oops, tried to write a message to {}, who is disconnected.", client_id);
-          self.find_or_establish_player(client_id).set_connected(false);
-        },
+    self.state.mut_players().iter_mut().foreach(|mut player| {
+      let id = player.get_id();
+
+      // Produce state snapshot for clients
+      let mut snapshot = Snapshot::new();
+      snapshot.set_your_id(id);
+      snapshot.set_players(RepeatedField::<PlayerLike>::from_vec(player_likes.clone()));
+      let mut snapshot_msg = ServerMessage::new();
+      snapshot_msg.set_message_type(ServerMessage_MessageType::SNAPSHOT);
+      snapshot_msg.set_snapshot(snapshot);
+      player.mut_mailbox().mut_outbound().push(snapshot_msg);
+
+      // Send all outbound msgs
+      player.mut_mailbox().take_outbound().into_iter().foreach(|message| {
+        let payload_bytes = message.write_to_bytes().expect("message wasnt serialzable?");
+        if let lite::WriteResult::Failure_NotConnected = network.write(id, payload_bytes) {
+          trace!("Oops, tried to write a message to {}, who is disconnected.", id);
+          player.set_connected(false);
+        }
+      })
+    });
+  }
+
+  fn produce_playerlikes(&self) -> Vec<PlayerLike> {
+    self.state.get_game().get_player_data().iter().map(|p| {
+      let mut player_like = PlayerLike::new();
+      player_like.set_id(p.get_id());
+      player_like.set_ready(p.get_ready());
+      player_like.set_match_data(p.get_match_data().clone());
+      player_like
+    }).collect()
+  }
+
+  fn bridge_network_state_and_game_state(&mut self) {
+    // Push events onto the associated players
+    let mut mail_per_player = self.state.mut_players()
+      .iter_mut()
+      .filter(|net_player| net_player.has_mailbox())
+      .map(|net_player| (net_player.get_id().clone(), net_player.take_mailbox()))
+      .collect::<HashMap<u32, Mailbox>>();
+    self.state.mut_game().mut_player_data().iter_mut().foreach(|player| {
+      let player_id = player.get_network_player_id();
+      if let Some(mailbox) = mail_per_player.remove(&player_id) {
+        if !player.get_mailbox().get_inbound().is_empty() {
+          warn!("game ply {} dropped some inbound mail on the ground", player_id)
+        }
+        if !player.get_mailbox().get_outbound().is_empty() {
+          warn!("game ply {} dropped some outbound mail on the ground", player_id)
+        }
+        player.set_mailbox(mailbox);
+      }
+    });
+
+    // Identify active network players
+    let mut net_player_ids = self.state.get_players().iter()
+      .filter(|ply| ply.get_connected())
+      .map(|ply| ply.get_id().clone())
+      .collect::<HashSet<u32>>();
+    // Update game players active state from network players
+    self.state.mut_game().mut_player_data().iter_mut()
+      .foreach(|mut game_ply| {
+        if net_player_ids.remove(&game_ply.get_network_player_id()) {
+          game_ply.set_active(true);
+        } else {
+          game_ply.set_active(false);
+        }
+      });
+    // Insert new network players as necessary
+    net_player_ids.into_iter().foreach(|id| {
+      let mut new_player_data = PlayerData::new();
+      new_player_data.set_active(true);
+      new_player_data.set_network_player_id(id);
+      self.state.mut_game().mut_player_data().push(new_player_data);
+    });
+  }
+
+  fn update_game_state(&mut self, microsecond_delta: i64) {
+    // NOTE: if this borrow affects further usage of state, whatever you're doing probably should
+    // not be in this function.
+    let mut game = self.state.mut_game();
+    let current_mode = game.get_mode().clone();
+
+    match current_mode {
+      GameMode::UNKNOWN => {
+        game.set_mode(GameMode::LOBBY)
+      },
+      GameMode::LOBBY => {
+        Lobby::new(&mut game).tick();
+      }
+      GameMode::PLAYING => {
+        Gameplay::new(&mut game, microsecond_delta).tick();
+      }
+    }
+  }
+
+  fn bridge_game_state_and_network_state(&mut self) {
+    // Push events onto the associated players
+    let mut mail_per_player = self.state.mut_game().mut_player_data()
+      .iter_mut()
+      .filter(|game_player| game_player.has_mailbox())
+      .map(|game_player| (game_player.get_network_player_id().clone(), game_player.take_mailbox()))
+      .collect::<HashMap<u32, Mailbox>>();
+    self.state.mut_players().iter_mut().foreach(|player| {
+      let player_id = player.get_id();
+      if let Some(mailbox) = mail_per_player.remove(&player_id) {
+        if !player.get_mailbox().get_inbound().is_empty() {
+          warn!("net ply {} dropped some inbound mail on the ground", player_id)
+        }
+        if !player.get_mailbox().get_outbound().is_empty() {
+          warn!("net ply {} dropped some outbound mail on the ground", player_id)
+        }
+        player.set_mailbox(mailbox);
       }
     });
   }
 
-  fn process_messages(&mut self, events: Vec<LiteServerEvent>) -> Vec<(u32, Vec<u8>)> {
+  fn process_messages(&mut self, events: Vec<LiteServerEvent>) {
     use lite::LiteServerEvent::*;
 
     for event in events.into_iter() {
@@ -76,10 +205,16 @@ impl RunningGame {
         ConnectionEstablished { client_id } => {
           let player = self.find_or_establish_player(client_id);
           player.set_connected(true);
+          let mut response = ServerMessage::new();
+          response.set_message_type(ServerMessage_MessageType::CONNECTED);
+          player.mut_mailbox().mut_outbound().push(response);
         }
         ConnectionDropped_Disconnect { client_id } | ConnectionDropped_Lag { client_id } => {
           let player = self.find_or_establish_player(client_id);
           player.set_connected(false);
+          let mut response = ServerMessage::new();
+          response.set_message_type(ServerMessage_MessageType::DISCONNECTED);
+          player.mut_mailbox().mut_outbound().push(response);
         }
         Data { client_id, bytes } => {
           let player = self.find_or_establish_player(client_id);
@@ -94,22 +229,10 @@ impl RunningGame {
             continue;
           }
 
-          let message = message_res.unwrap();
-          match message.get_message_type() {
-            ClientMessage_MessageType::UNKNOWN => {
-              trace!("Player {} sent well formed unknown type payload.", client_id);
-            },
-            ClientMessage_MessageType::MOVE => {
-              let move_data = message.get_move_data();
-              trace!("Player {} tried to move to {} but we dont support moving yet.", client_id, move_data.get_y());
-            }
-          }
+          player.mut_mailbox().mut_inbound().push(message_res.unwrap());
         }
       }
     }
-
-    // We don't have anything to say yet.
-    Vec::new()
   }
 
   fn find_or_establish_player(&mut self, client_id: u32) -> &mut NetworkPlayer {
@@ -153,22 +276,34 @@ impl Game<State, Transient> for RunningGame {
   }
 
   fn run(&mut self) {
-    let now = PreciseTime::now();
+    let now = SteadyTime::now();
 
-    let delta = self.last_run_time.to(now.clone());
+    if now > self.next_net_time {
+      self.next_net_time = now + *NET_INTERVAL_US;
+      self.last_net_time = now;
+      self.update_network_state();
+    }
 
-    self.last_run_time = now;
-    let microsecond_delta = delta.num_microseconds()
-      .expect("time between runs was way too long (over 280k years!)");
-    let next_timestamp = self.state.get_time().get_timestamp().clone() + microsecond_delta;
-    self.state.mut_time().set_timestamp(next_timestamp);
+    if now > self.next_sim_time {
+      let delta = now.clone() - self.last_sim_time;
+      self.next_sim_time = now + *SIM_INTERVAL_US;
+      self.last_sim_time = now;
 
-    self.update_network_state();
+      let microsecond_delta = delta.num_microseconds()
+        .expect("time between runs was way too long (over 280k years!)");
+
+      let next_timestamp = self.state.get_time().get_timestamp().clone() + microsecond_delta;
+      self.state.mut_time().set_timestamp(next_timestamp);
+
+      self.bridge_network_state_and_game_state();
+      self.update_game_state(microsecond_delta);
+      self.bridge_game_state_and_network_state();
+    }
+    thread::sleep(::std::time::Duration::new(0, 500000));
   }
 
   fn build_state(&self) -> State {
-    let mut state = self.state.clone();
-    state
+    self.state.clone()
   }
 
   fn build_transient(self) -> Transient {

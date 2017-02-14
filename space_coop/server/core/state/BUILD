@@ -12,4 +12,12 @@ load("//tools/bazel/proto:rust.bzl", "rust_proto_library")
 rust_proto_library(
     name = "state_proto",
     protos = ["state.proto"],
+    proto_deps = [
+        "//space_coop/common:network_proto",
+        "//space_coop/common:game_proto",
+    ],
+    proto_dep_crates = [
+        "network_proto",
+        "game_proto",
+    ],
 )

@@ -1,25 +1,45 @@
 syntax = "proto2";
 
+import "space_coop/common/game.proto";
+
 package space_coop.common.network;
 
+// Defines the payload to be sent from a client
 message ClientMessage {
+  // Defines the kinds of events sendable from a client
   enum MessageType {
+    // Indicates that this message has an indeterminate type
     UNKNOWN = 0;
     MOVE = 1;
   }
 
+  // A client request to move their character
   message MoveData {
+    // A desired Y position to move to
     optional uint32 y = 1;
   }
 
+  // The kind of payload that this message contains
   optional MessageType message_type = 1;
+  // The body of a MOVE message_type
   optional MoveData move_data = 2;
 }
 
 message ServerMessage {
+  // Defines the kinds of events sendable from a server
   enum MessageType {
+    // Indicates that this message has an indeterminate type
     UNKNOWN = 0;
+    // Instructs the player to set their own state to connected
+    CONNECTED = 1;
+    // Instructs the player to set their own state to disconnnected
+    DISCONNECTED = 2;
+    // Provides the player with the latest game state
+    SNAPSHOT = 3;
   }
 
+  // The kind of payload that this message contains
   optional MessageType message_type = 1;
+  // The body of a SNAPSHOT message_type
+  optional space_coop.common.game.Snapshot snapshot = 2;
 }

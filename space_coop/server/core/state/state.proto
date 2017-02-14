@@ -1,32 +1,72 @@
 syntax = "proto2";
 
+import "space_coop/common/network.proto";
+import "space_coop/common/game.proto";
+
 package space_coop.server.core.state;
 
 // The time, and associated mode
 message Time {
-  enum TimeMode {
-    NORMAL = 1;
-    REPLAY = 2;
-  }
-  optional TimeMode mode = 1;
+  // The current game timestamp
   optional int64 timestamp = 2;
-  optional int64 rewind_timestamp = 3;
 }
 
 // The required components to create our network
 message NetworkConfig {
+  // Hosting port
   optional int32 port = 1;
 }
 
 // The total state of the game world.
 message State {
+  // Relevant timekeeping information
   optional Time time = 1;
+  // Network configuration for starting or restaring game
   optional NetworkConfig network = 2;
+  // Connected network-level player entities
   repeated NetworkPlayer players = 3;
+  // Game state
+  optional Game game = 4;
 }
 
 // A network connection with a person behind it
 message NetworkPlayer {
+  // A network-level identifier
   optional uint32 id = 1;
+  // The current connection status
   optional bool connected = 2;
+  // The inbound and outbound events for the player entity
+  optional Mailbox mailbox = 3;
+}
+
+// The inbound and outbound events for an entity
+message Mailbox {
+  // Describes unprocessed events inbound from the client
+  repeated space_coop.common.network.ClientMessage inbound = 1;
+  // Describes unsent events outbound to the client
+  repeated space_coop.common.network.ServerMessage outbound = 2;
+}
+
+// The domain-level game state
+message Game {
+  // The current mode of play
+  optional space_coop.common.game.GameMode mode = 1;
+  // The game-domain level player data
+  repeated PlayerData player_data = 2;
+}
+
+// A game level player entity
+message PlayerData {
+  // The game designation for the entity. Currently unset (and implicit)
+  optional uint32 id = 1;
+  // The network designation for the entity
+  optional uint32 network_player_id = 2;
+  // The gameplay information for the player
+  optional space_coop.common.game.MatchData match_data = 3;
+  // An indicator for if the player is actually in game
+  optional bool active = 4;
+  // An indicator for if the player is ready to begin play
+  optional bool ready = 5;
+  // The inbound and outbound events for the player entity
+  optional Mailbox mailbox = 6;
 }
