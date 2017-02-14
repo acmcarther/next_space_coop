@@ -8,8 +8,6 @@ use loader::BasicProxy;
 use loader::Hotloader;
 use std::env;
 use std::path::PathBuf;
-use std::thread;
-use std::time::Duration;
 
 static EXAMPLE_COMMAND: &'static str = "space_coop -- -d ./core/libcore.so";
 

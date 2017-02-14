@@ -1,45 +1,57 @@
-extern crate dylib_core;
-extern crate client_state;
+// TODO(acmcarther): this is copy pasta from space_coop/server
+extern crate state_proto;
+extern crate lite;
+extern crate network_proto;
+extern crate game_proto;
+extern crate libc;
+extern crate clap;
+extern crate protobuf;
+extern crate gaffer_udp;
+extern crate fern;
+extern crate time;
+extern crate rand;
+extern crate itertools;
+#[macro_use]
+extern crate loadable;
 
-use client_state::state::State;
+#[macro_use]
+extern crate lazy_static;
 
-struct TotalState;
-struct OpaqueState;
+#[macro_use]
+extern crate log;
 
-struct Client {
-  pub state: State
-}
+mod game;
 
-impl Client {
-}
+use loadable::SnapshottedGame;
+use game::State;
+use game::Transient;
+use game::RunningGame;
+use std::sync::Mutex;
 
-impl Game<State, ()> for Client {
-  fn new(_: ArgMatches) -> Client {
-    Client::new(State::new())
-  }
+fn init_logger() {
+  let logger_config = fern::DispatchConfig {
+      format: Box::new(|msg: &str, level: &log::LogLevel, _location: &log::LogLocation| {
+          format!("[{}][{}] {}", time::now().strftime("%Y-%m-%d][%H:%M:%S").unwrap(), level, msg)
+      }),
+      output: vec![fern::OutputConfig::stdout(), fern::OutputConfig::file("logs/client.log")],
+      level: log::LogLevelFilter::Trace,
+  };
 
-  fn new_from_hotload(persistent: State, _: ()) {
-    Client::new(State::new())
-  }
+  fern::init_global_logger(logger_config, log::LogLevelFilter::Trace)
+    .expect("could not load logger");
 
-  fn copy_persistent_state(&self) -> State {
-    client.state.clone()
-  }
-
-  fn take_transient_state(self) -> () {
-    ()
-  }
+  info!("Started dylib logger");
 }
 
 lazy_static! {
-  static ref STATE: Mutex<DylibFFI<State, (), Client>>> = {
-    let logger_config = dylib_core::get_default_logger_config("./log/client.log")
-
-    fern::init_global_logger(logger_config, log::LogLevelFilter::Trace)
-      .expect("could not load logger");
-
-    Mutex::new(DylibGame::new());
-  }
+  static ref GAME_STATE: Mutex<Option<SnapshottedGame<State, Transient, RunningGame>>> = {
+    init_logger();
+    Mutex::new(None)
+  };
 }
 
-generate_ffi!(STATE)
+// Used by ffi macro below for naming output snapshot files
+static APP_NAME: &'static str = "spacecoop-client";
+
+generate_ffi! {}
+pub use ffi::*;

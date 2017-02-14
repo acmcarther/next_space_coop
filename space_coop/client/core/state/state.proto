@@ -1,0 +1,44 @@
+syntax = "proto2";
+
+import "space_coop/common/network.proto";
+import "space_coop/common/game.proto";
+
+package space_coop.client.core.state;
+
+// The total state of the game world.
+// NEXT ID = 7
+message State {
+  // The current game timestamp
+  optional int64 timestamp = 1;
+  // The last seen server timestamp
+  optional int64 server_timestamp = 2;
+  // Our own address
+  optional string client_addr = 3;
+  // The server connection information, in the form of ip:port
+  optional string server_addr = 4;
+  // Our network io
+  optional Mailbox mailbox = 5;
+  // The game state
+  optional Game game = 6;
+}
+
+// The inbound and outbound events for an entity
+// This is flip flopped from the server's own notion of a mailbox
+// NEXT ID = 3
+message Mailbox {
+  // Describes unprocessed events inbound from the server
+  repeated space_coop.common.network.ServerMessage inbound = 1;
+  // Describes unsent events outbound to the server
+  repeated space_coop.common.network.ClientMessage outbound = 2;
+}
+
+// The domain-level game state
+// NEXT ID = 4
+message Game {
+  // The current mode of play
+  optional space_coop.common.game.GameMode mode = 1;
+  // Our own id
+  optional uint32 id = 2;
+  // The game-domain level player data
+  repeated space_coop.common.game.PlayerLike player_data = 3;
+}
