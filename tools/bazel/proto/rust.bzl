@@ -8,7 +8,27 @@ load(
 )
 
 load("@org_pubref_rules_protobuf//protobuf:rules.bzl", "proto_compile")
-load("//tools/rust:codegen.bzl", "gen_rust_library")
+
+def build_librs_cmd(deps):
+  lib_rs = "echo \"extern crate protobuf;\" > $@"
+  for dep in deps:
+    lib_rs = lib_rs + "echo \"extern crate %s;\" >> $@" % dep
+  use_cmds ="".join(["echo \"use %s::*;\" >> $@" % dep for dep in deps])
+  lib_rs = lib_rs + """
+  for s in $(SRCS)
+  do
+    path_less_rs="$${s%%.rs}"
+    path_less_tree="$${path_less_rs##*/}"
+    echo "pub mod $$path_less_tree {\n" >> $@
+    sed 's/super::*//g' $$s >> $@
+    # Pipe use statements into the end of the mod to
+    # prevent trying to use before #[allow]
+    %s
+    echo "}\n" >> $@
+  done
+  """ % use_cmds
+
+  return lib_rs
 
 def rust_proto_library(
     name,
@@ -17,11 +37,7 @@ def rust_proto_library(
     proto_deps = [],
     proto_dep_crates = []):
 
-  extern_crates = ["extern crate protobuf;"] + ["extern crate {};".format(dep) for dep in proto_dep_crates]
-
-  proto_dep_uses = ["pub use {}::*;".format(dep) for dep in proto_dep_crates]
-  mod_names = ["pub mod {};".format(p_name.split(".")[0]) for p_name in protos];
-  lib_rs_content = "\n".join(extern_crates) + "\n".join(proto_dep_uses) + "\n".join(mod_names)
+  proto_dep_uses = ["use {};".format(dep) for dep in proto_dep_crates]
 
   proto_compile(
     name = name + ".pb",
@@ -33,14 +49,15 @@ def rust_proto_library(
 
   native.genrule(
     name = name + "lib_rs",
+    srcs = [name + ".pb"],
     outs = [name + "_lib.rs"],
     # This is a pretty naive soln
-    cmd = "echo \"" + lib_rs_content + "\" > $@"
+    cmd = build_librs_cmd(proto_dep_crates)
   )
 
   rust_library(
     name = name,
-    srcs = [name + "lib_rs"] + [name + ".pb"],
+    srcs = [name + "lib_rs"],
     crate_root = name + "_lib.rs",
     deps = ["@protoc_gen_rust//:protobuf",] + proto_deps,
   )

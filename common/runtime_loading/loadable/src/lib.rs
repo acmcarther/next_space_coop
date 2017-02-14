@@ -42,7 +42,6 @@ macro_rules! generate_ffi {
 
       #[no_mangle]
       pub fn run() {
-        trace!("Running main function");
         let mut state = GAME_STATE.lock().unwrap();
         state.as_mut()
           .expect("must call new or hotload before run")
@@ -89,7 +88,7 @@ impl<T> OpaqueState<T> {
 fn new_snapshotter<S: ::protobuf::MessageStatic>(name: &str) -> Snapshotter<S> {
   let mut snap_path = env::temp_dir();
   snap_path.push(format!("{}.snapshot", name));
-  Snapshotter::new(1000 /* rate */, snap_path)
+  Snapshotter::new(50000 /* rate */, snap_path)
 }
 
 pub struct SnapshottedGame<S: ::protobuf::MessageStatic, T, G: Game<S, T>> {

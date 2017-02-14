@@ -1,0 +1,49 @@
+syntax = "proto2";
+
+package space_coop.common.game;
+
+// Defines what the current "highest level" stage of the game is
+// NEXT ID: 3
+enum GameMode {
+  // The game is currently in an indeterminate state.
+  UNKNOWN = 0;
+  // The game is in the lobby mode. Gameplay will commence under certain conditions
+  LOBBY = 1;
+  // The game is currently underway
+  PLAYING = 2;
+}
+
+// Defines a "player-like" object, that roughly corresponds to the server's own recorded player state
+// NEXT ID: 3
+message PlayerLike {
+  // The server's own id for this player
+  optional uint32 id = 1;
+  // Whether or not the player is currently ready to proceed to the PLAYING state
+  optional bool ready = 2;
+  // The Player's current in game data
+  optional MatchData match_data = 3;
+}
+
+// Defines the player's own state in the context of the game.
+// NEXT ID: 2
+message MatchData {
+  // Defines a location in space
+  // NEXT ID: 4
+  message Position {
+    optional float x = 1;
+    optional float y = 2;
+    optional float z = 3;
+  }
+
+  // Where the player's in game entity is currently positioned, relative to the global 0, 0, 0
+  optional Position position = 1;
+}
+
+// Defines a client-centric full picture of the current state of the game
+// NEXT ID: 3
+message Snapshot {
+  // What the receiver's own id is
+  optional uint32 your_id = 1;
+  // The selected player data presented to the client
+  repeated PlayerLike players = 2;
+}

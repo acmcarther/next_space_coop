@@ -2,18 +2,32 @@ syntax = "proto2";
 
 package network.lite;
 
+// Defines a message that can be sent over the wire
 message LiteMessage {
+  // Defines a kind of message to send
   enum Type {
+    // The default message, indicating for the receiver to hold the connection open
     KEEP_ALIVE = 0;
+    // Connection establishment msg, see TCP
     SYN = 1;
+    // Connection establishment ack msg, see TCP
     SYN_ACK = 2;
+    // Connection establishment complete msg, see TCP
     ACK = 3;
+    // A request to close the connection, the connection is now considered dropped
     CLOSE = 4;
+    // A courteous response indicating that the sender has no connection with the receiver
     UNKNOWN_SENDER = 5;
+    // A message bearing a payload
     DATA = 6;
   }
+
+  // The kind of message in this payload
   optional Type packet_type = 1;
+  // The network-designated id for the sender
   optional uint32 origin_id = 2;
+  // A request for the receiver to change their designation
   optional uint32 set_your_id = 3;
+  // A payload, to accompany a DATA packet_type
   optional bytes data = 4;
 }
