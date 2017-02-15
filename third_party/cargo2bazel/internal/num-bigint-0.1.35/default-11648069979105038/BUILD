@@ -17,9 +17,7 @@ licenses(["notice"])
 
 rust_library(
     name = "num_bigint",
-    deps = ["//third_party/cargo2bazel/internal/rand-0.3.15/default-11648069979105038:rand", 
-            "//third_party/cargo2bazel/internal/rustc-serialize-0.3.22/default-11648069979105038:rustc_serialize", 
-            "//third_party/cargo2bazel/internal/num-traits-0.1.36/default-11648069979105038:num_traits", 
+    deps = ["//third_party/cargo2bazel/internal/num-traits-0.1.36/default-11648069979105038:num_traits", 
             "//third_party/cargo2bazel/internal/num-integer-0.1.32/default-11648069979105038:num_integer"],
     srcs = ["//third_party/cargo2bazel/internal/num-bigint-0.1.35:sources"],
     rustc_flags = [

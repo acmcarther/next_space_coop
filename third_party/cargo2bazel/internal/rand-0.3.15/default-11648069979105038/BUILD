@@ -17,7 +17,7 @@ licenses(["notice"])
 
 rust_library(
     name = "rand",
-    deps = ["//third_party/cargo2bazel/internal/libc-0.2.18/default-11648069979105038:libc"],
+    deps = ["//third_party/cargo2bazel/internal/libc-0.2.20/default-11648069979105038:libc"],
     srcs = ["//third_party/cargo2bazel/internal/rand-0.3.15:sources"],
     rustc_flags = [
       "--cap-lints warn",

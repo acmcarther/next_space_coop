@@ -20,7 +20,7 @@ rust_library(
     deps = ["//third_party/cargo2bazel/internal/utf8-ranges-1.0.0/default-11648069979105038:utf8_ranges", 
             "//third_party/cargo2bazel/internal/regex-syntax-0.4.0/default-11648069979105038:regex_syntax", 
             "//third_party/cargo2bazel/internal/thread_local-0.3.2/default-11648069979105038:thread_local", 
-            "//third_party/cargo2bazel/internal/aho-corasick-0.6.1/default-11648069979105038:aho_corasick", 
+            "//third_party/cargo2bazel/internal/aho-corasick-0.6.2/default-11648069979105038:aho_corasick", 
             "//third_party/cargo2bazel/internal/memchr-1.0.1/default-11648069979105038:memchr"],
     srcs = ["//third_party/cargo2bazel/internal/regex-0.2.1:sources"],
     rustc_flags = [

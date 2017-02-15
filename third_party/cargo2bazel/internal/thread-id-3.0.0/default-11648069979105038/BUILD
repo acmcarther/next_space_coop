@@ -17,7 +17,7 @@ licenses(["notice"])
 
 rust_library(
     name = "thread_id",
-    deps = ["//third_party/cargo2bazel/internal/libc-0.2.18/default-11648069979105038:libc", 
+    deps = ["//third_party/cargo2bazel/internal/libc-0.2.20/default-11648069979105038:libc", 
             "//third_party/cargo2bazel/internal/kernel32-sys-0.2.2/default-11648069979105038:kernel32_sys"],
     srcs = ["//third_party/cargo2bazel/internal/thread-id-3.0.0:sources"],
     rustc_flags = [

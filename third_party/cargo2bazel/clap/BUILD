@@ -7,5 +7,5 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])
 alias(
     name = "clap",
-    actual = "//third_party/cargo2bazel/internal/clap-2.20.0/default-11648069979105038:clap",
+    actual = "//third_party/cargo2bazel/internal/clap-2.20.3/default-11648069979105038:clap",
 )

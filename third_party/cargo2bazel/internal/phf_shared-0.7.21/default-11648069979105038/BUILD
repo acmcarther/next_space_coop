@@ -17,7 +17,7 @@ licenses(["notice"])
 
 rust_library(
     name = "phf_shared",
-    deps = ["//third_party/cargo2bazel/internal/siphasher-0.2.0/default-11648069979105038:siphasher"],
+    deps = ["//third_party/cargo2bazel/internal/siphasher-0.2.1/default-11648069979105038:siphasher"],
     srcs = ["//third_party/cargo2bazel/internal/phf_shared-0.7.21:sources"],
     rustc_flags = [
       "--cap-lints warn",

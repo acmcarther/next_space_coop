@@ -18,7 +18,7 @@ licenses(["notice"])
 rust_library(
     name = "gaffer_udp",
     deps = ["//third_party/cargo2bazel/internal/itertools-0.5.9/default-11648069979105038:itertools", 
-            "//third_party/cargo2bazel/internal/mio-0.6.2/default-11648069979105038:mio", 
+            "//third_party/cargo2bazel/internal/mio-0.6.4/default-11648069979105038:mio", 
             "//third_party/cargo2bazel/internal/byteorder-1.0.0/default-11648069979105038:byteorder"],
     srcs = ["//third_party/cargo2bazel/internal/gaffer_udp-0.1.4:sources"],
     rustc_flags = [

@@ -7,5 +7,5 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])
 alias(
     name = "libloading",
-    actual = "//third_party/cargo2bazel/internal/libloading-0.3.1/default-11648069979105038:libloading",
+    actual = "//third_party/cargo2bazel/internal/libloading-0.3.2/default-11648069979105038:libloading",
 )

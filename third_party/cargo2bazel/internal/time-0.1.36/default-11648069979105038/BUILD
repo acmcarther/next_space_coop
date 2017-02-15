@@ -17,9 +17,9 @@ licenses(["notice"])
 
 rust_library(
     name = "time",
-    deps = ["//third_party/cargo2bazel/internal/libc-0.2.18/default-11648069979105038:libc", 
-            "//third_party/cargo2bazel/internal/kernel32-sys-0.2.2/default-11648069979105038:kernel32_sys", 
-            "//third_party/cargo2bazel/internal/winapi-0.2.8/default-11648069979105038:winapi"],
+    deps = ["//third_party/cargo2bazel/internal/libc-0.2.20/default-11648069979105038:libc", 
+            "//third_party/cargo2bazel/internal/winapi-0.2.8/default-11648069979105038:winapi", 
+            "//third_party/cargo2bazel/internal/kernel32-sys-0.2.2/default-11648069979105038:kernel32_sys"],
     srcs = ["//third_party/cargo2bazel/internal/time-0.1.36:sources"],
     rustc_flags = [
       "--cap-lints warn",

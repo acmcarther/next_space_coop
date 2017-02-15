@@ -17,8 +17,8 @@ licenses(["notice"])
 
 rust_library(
     name = "thread_local",
-    deps = ["//third_party/cargo2bazel/internal/unreachable-0.1.1/default-11648069979105038:unreachable", 
-            "//third_party/cargo2bazel/internal/thread-id-3.0.0/default-11648069979105038:thread_id"],
+    deps = ["//third_party/cargo2bazel/internal/thread-id-3.0.0/default-11648069979105038:thread_id", 
+            "//third_party/cargo2bazel/internal/unreachable-0.1.1/default-11648069979105038:unreachable"],
     srcs = ["//third_party/cargo2bazel/internal/thread_local-0.3.2:sources"],
     rustc_flags = [
       "--cap-lints warn",

@@ -19,6 +19,7 @@ lazy_static = "0.2.2"
 time = "0.1.35"
 rand = "0.3.15"
 gaffer_udp = "0.1.4"
+ash = "0.14.2"
 
 [dependencies.error-chain]
 version = "0.8.1"

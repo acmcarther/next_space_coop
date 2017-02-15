@@ -17,7 +17,7 @@ licenses(["notice"])
 
 rust_library(
     name = "memchr",
-    deps = ["//third_party/cargo2bazel/internal/libc-0.2.18/no_default-11648069979105038:libc"],
+    deps = ["//third_party/cargo2bazel/internal/libc-0.2.20/no_default-11648069979105038:libc"],
     srcs = ["//third_party/cargo2bazel/internal/memchr-1.0.1:sources"],
     rustc_flags = [
       "--cap-lints warn",

@@ -7,5 +7,5 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])
 alias(
     name = "libc",
-    actual = "//third_party/cargo2bazel/internal/libc-0.2.18/default-11648069979105038:libc",
+    actual = "//third_party/cargo2bazel/internal/libc-0.2.20/default-11648069979105038:libc",
 )

@@ -17,7 +17,7 @@ licenses(["notice"])
 
 rust_library(
     name = "itertools",
-    deps = ["//third_party/cargo2bazel/internal/either-1.0.2/no_default-11648069979105038:either"],
+    deps = ["//third_party/cargo2bazel/internal/either-1.0.3/no_default-11648069979105038:either"],
     srcs = ["//third_party/cargo2bazel/internal/itertools-0.5.9:sources"],
     rustc_flags = [
       "--cap-lints warn",

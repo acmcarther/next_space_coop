@@ -17,9 +17,9 @@ licenses(["notice"])
 
 rust_library(
     name = "net2",
-    deps = ["//third_party/cargo2bazel/internal/cfg-if-0.1.0/default-11648069979105038:cfg_if", 
+    deps = ["//third_party/cargo2bazel/internal/libc-0.2.20/default-11648069979105038:libc", 
+            "//third_party/cargo2bazel/internal/cfg-if-0.1.0/default-11648069979105038:cfg_if", 
             "//third_party/cargo2bazel/internal/ws2_32-sys-0.2.1/default-11648069979105038:ws2_32_sys", 
-            "//third_party/cargo2bazel/internal/libc-0.2.18/default-11648069979105038:libc", 
             "//third_party/cargo2bazel/internal/kernel32-sys-0.2.2/default-11648069979105038:kernel32_sys", 
             "//third_party/cargo2bazel/internal/winapi-0.2.8/default-11648069979105038:winapi"],
     srcs = ["//third_party/cargo2bazel/internal/net2-0.2.26:sources"],
