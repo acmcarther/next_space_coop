@@ -20,6 +20,7 @@ rust_library(
         "//network/lite",
         "//common/runtime_loading/loadable",
         "//space_coop/client/core/state:state_proto",
+        "//third_party/cargo2bazel/ash",
         "//third_party/cargo2bazel/log",
         "//third_party/cargo2bazel/itertools",
         "//third_party/cargo2bazel/gaffer_udp",

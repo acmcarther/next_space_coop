@@ -1,5 +1,6 @@
 // TODO(acmcarther): this is copy pasta from space_coop/server
 extern crate state_proto;
+extern crate ash;
 extern crate lite;
 extern crate network_proto;
 extern crate game_proto;
