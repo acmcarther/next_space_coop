@@ -10,8 +10,8 @@ rust_library(
     srcs = glob(["src/**/*.rs"]),
     deps = [
         "@protoc_gen_rust//:protobuf",
-        "//third_party/cargo2bazel/clap",
-        "//third_party/cargo2bazel/log",
-        "//third_party/cargo2bazel/libc",
+        "//cargo/vendor:clap",
+        "//cargo/vendor:log",
+        "//cargo/vendor:libc",
     ]
 )

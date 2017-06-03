@@ -17,9 +17,9 @@ rust_library(
       ":lite_proto",
       "@protoc_gen_rust//:protobuf",
       "//common/clock",
-      "//third_party/cargo2bazel/gaffer_udp",
-      "//third_party/cargo2bazel/itertools",
-      "//third_party/cargo2bazel/log",
+      "//cargo/vendor:gaffer_udp",
+      "//cargo/vendor:itertools",
+      "//cargo/vendor:log",
     ]
 )
 
@@ -32,12 +32,12 @@ rust_test(
       ":lite_proto",
       "@protoc_gen_rust//:protobuf",
       "//common/clock",
-      "//third_party/cargo2bazel/gaffer_udp",
-      "//third_party/cargo2bazel/fern",
-      "//third_party/cargo2bazel/time",
-      "//third_party/cargo2bazel/lazy_static",
-      "//third_party/cargo2bazel/log",
-      "//third_party/cargo2bazel/itertools",
+      "//cargo/vendor:gaffer_udp",
+      "//cargo/vendor:fern",
+      "//cargo/vendor:time",
+      "//cargo/vendor:lazy_static",
+      "//cargo/vendor:log",
+      "//cargo/vendor:itertools",
     ]
 )
 
