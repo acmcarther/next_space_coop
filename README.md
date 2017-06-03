@@ -23,11 +23,10 @@ cargo install cargo-raze
 Then:
 
 1. Add a dependency to the [Cargo.toml](./cargo/Cargo.toml)
-2. Run `cargo generate-lockfile`
-2. Run `cargo vendor -x`
-2. Run `cargo raze "//cargo/vendor"`
-
-Theres currently a small set of edits to the generated BUILD files to handle some corner cases, which need to be reapplied after regenerating the cargo dependencies
+2. Open a shell into `./cargo`
+3. Run `cargo generate-lockfile`
+4. Run `cargo vendor -x`
+5. Run `cargo raze "//cargo/vendor"`
 
 ### Building Rust on Nix
 
