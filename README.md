@@ -12,9 +12,15 @@ All required third party dependencies should already exist in //third_party.
 
 ### Working with Cargo.toml
 
-We use Cargo (Rust's package manager) for dependency location and resolution, but there is a bit of a ritual to perform to acquire new dependencies.
+We use Cargo (Rust's package manager) for third party dependency location and resolution, but there is a bit of a ritual to perform to acquire new dependencies.
 
-Install `cargo-vendor` and `cargo-raze` via `cargo install`
+Install `cargo-vendor` and `cargo-raze` via `cargo install`, like
+```
+cargo install cargo-vendor
+cargo install cargo-raze
+```
+
+Then:
 
 1. Add a dependency to the [Cargo.toml](./cargo/Cargo.toml)
 2. Run `cargo generate-lockfile
