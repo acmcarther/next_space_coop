@@ -23,7 +23,7 @@ cargo install cargo-raze
 Then:
 
 1. Add a dependency to the [Cargo.toml](./cargo/Cargo.toml)
-2. Run `cargo generate-lockfile
+2. Run `cargo generate-lockfile`
 2. Run `cargo vendor -x`
 2. Run `cargo raze "//cargo/vendor"`
 
