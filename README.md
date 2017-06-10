@@ -12,13 +12,21 @@ All required third party dependencies should already exist in //third_party.
 
 ### Working with Cargo.toml
 
-We use Cargo (Rust's package manager) for dependency location and resolution, but there is a bit of a ritual to perform to acquire new dependencies.
+We use Cargo (Rust's package manager) for third party dependency location and resolution, but there is a bit of a ritual to perform to acquire new dependencies.
 
-1. Add a dependency to the Cargo.toml
-2. Execute `cargo fetch` to resolve the dependencies to the `Cargo.lock`
-3. Re-run `resolve_cargo_deps.sh` to rebuild the list of dependencies.
+Install `cargo-vendor` and `cargo-raze` via `cargo install`, like
+```
+cargo install cargo-vendor
+cargo install cargo-raze
+```
 
-Theres currently a small set of edits to the generated BUILD files to handle some corner cases, which need to be reapplied after regenerating the cargo dependencies
+Then:
+
+1. Add a dependency to the [Cargo.toml](./cargo/Cargo.toml)
+2. Open a shell into `./cargo`
+3. Run `cargo generate-lockfile`
+4. Run `cargo vendor -x`
+5. Run `cargo raze "//cargo/vendor"`
 
 ### Building Rust on Nix
 
@@ -27,6 +35,10 @@ For users on Nixos, there is an extra step -- patching the rustc the cargo pulls
 ```
  patchelf  --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" ~/.cache/bazel/_bazel_alex/137a6182ca2a00cee867ee137dbd907b/execroot/prototype3/external/rust_linux_x86_64/rustc/bin/rustc
 ```
+
+### Building with Bazel on NixOS
+
+This repo comes bundled with a default.nix, and an old-ish `bazel` dependency override. You'll want to link that in, or go excavate a newer version from [my dotfiles](https://github.com/acmcarther/essentials/tree/master/nix/packages/bazel)
 
 ## Code organization
 

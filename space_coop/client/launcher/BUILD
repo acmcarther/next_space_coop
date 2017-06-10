@@ -12,6 +12,6 @@ rust_binary(
     ],
     deps = [
       "//common/runtime_loading/loader",
-      "//third_party/cargo2bazel/clap",
+      "//cargo/vendor:clap",
     ]
 )
