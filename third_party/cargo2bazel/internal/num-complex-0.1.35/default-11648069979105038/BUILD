@@ -17,7 +17,8 @@ licenses(["notice"])
 
 rust_library(
     name = "num_complex",
-    deps = ["//third_party/cargo2bazel/internal/num-traits-0.1.36/default-11648069979105038:num_traits"],
+    deps = ["//third_party/cargo2bazel/internal/rustc-serialize-0.3.22/default-11648069979105038:rustc_serialize", 
+            "//third_party/cargo2bazel/internal/num-traits-0.1.36/default-11648069979105038:num_traits"],
     srcs = ["//third_party/cargo2bazel/internal/num-complex-0.1.35:sources"],
     rustc_flags = [
       "--cap-lints warn",
