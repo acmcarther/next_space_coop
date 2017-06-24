@@ -24,24 +24,28 @@ platform_attrs:
     "unix"
 ]
 
-DO NOT MODIFY! Instead, add a CargoOverride.bzl mixin.
+DO NOT MODIFY! Instead, update vendor/CargoOverrides.bzl.
 """
 description = struct(
     package = struct(
         pkg_name = "memchr",
         pkg_version = "1.0.1",
     ),
+    bazel_config = struct(
+        use_build_rs = True,
+        use_metadeps = False,
+    ),
     dependencies = [
         struct(
             name = "libc",
-            version = "0.2.20",
+            version = "0.2.24",
         ),
     ],
     build_dependencies = [],
     dev_dependencies = [],
     features = [
-        "use_std",
         "libc",
+        "use_std",
         "default",
     ],
     targets = [

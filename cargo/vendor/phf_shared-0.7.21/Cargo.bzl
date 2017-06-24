@@ -24,17 +24,21 @@ platform_attrs:
     "unix"
 ]
 
-DO NOT MODIFY! Instead, add a CargoOverride.bzl mixin.
+DO NOT MODIFY! Instead, update vendor/CargoOverrides.bzl.
 """
 description = struct(
     package = struct(
         pkg_name = "phf_shared",
         pkg_version = "0.7.21",
     ),
+    bazel_config = struct(
+        use_build_rs = True,
+        use_metadeps = False,
+    ),
     dependencies = [
         struct(
             name = "siphasher",
-            version = "0.2.1",
+            version = "0.2.2",
         ),
     ],
     build_dependencies = [],

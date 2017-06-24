@@ -24,17 +24,21 @@ platform_attrs:
     "unix"
 ]
 
-DO NOT MODIFY! Instead, add a CargoOverride.bzl mixin.
+DO NOT MODIFY! Instead, update vendor/CargoOverrides.bzl.
 """
 description = struct(
     package = struct(
         pkg_name = "fern",
         pkg_version = "0.3.5",
     ),
+    bazel_config = struct(
+        use_build_rs = True,
+        use_metadeps = False,
+    ),
     dependencies = [
         struct(
             name = "log",
-            version = "0.3.6",
+            version = "0.3.8",
         ),
     ],
     build_dependencies = [],

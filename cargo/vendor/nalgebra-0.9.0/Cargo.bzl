@@ -24,25 +24,29 @@ platform_attrs:
     "unix"
 ]
 
-DO NOT MODIFY! Instead, add a CargoOverride.bzl mixin.
+DO NOT MODIFY! Instead, update vendor/CargoOverrides.bzl.
 """
 description = struct(
     package = struct(
         pkg_name = "nalgebra",
         pkg_version = "0.9.0",
     ),
+    bazel_config = struct(
+        use_build_rs = True,
+        use_metadeps = False,
+    ),
     dependencies = [
         struct(
             name = "rustc-serialize",
-            version = "0.3.22",
+            version = "0.3.24",
+        ),
+        struct(
+            name = "num",
+            version = "0.1.39",
         ),
         struct(
             name = "rand",
             version = "0.3.15",
-        ),
-        struct(
-            name = "num",
-            version = "0.1.36",
         ),
     ],
     build_dependencies = [],

@@ -24,36 +24,40 @@ platform_attrs:
     "unix"
 ]
 
-DO NOT MODIFY! Instead, add a CargoOverride.bzl mixin.
+DO NOT MODIFY! Instead, update vendor/CargoOverrides.bzl.
 """
 description = struct(
     package = struct(
         pkg_name = "nphysics3d",
         pkg_version = "0.5.0",
     ),
+    bazel_config = struct(
+        use_build_rs = True,
+        use_metadeps = False,
+    ),
     dependencies = [
         struct(
-            name = "ncollide",
-            version = "0.10.0",
+            name = "num",
+            version = "0.1.39",
         ),
         struct(
             name = "nalgebra",
             version = "0.9.0",
         ),
         struct(
-            name = "num",
-            version = "0.1.36",
+            name = "ncollide",
+            version = "0.10.0",
         ),
         struct(
             name = "rustc-serialize",
-            version = "0.3.22",
+            version = "0.3.24",
         ),
     ],
     build_dependencies = [],
     dev_dependencies = [],
     features = [
-        "default",
         "dim3",
+        "default",
     ],
     targets = [
         struct(

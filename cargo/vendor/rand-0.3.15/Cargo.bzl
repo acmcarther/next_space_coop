@@ -24,17 +24,21 @@ platform_attrs:
     "unix"
 ]
 
-DO NOT MODIFY! Instead, add a CargoOverride.bzl mixin.
+DO NOT MODIFY! Instead, update vendor/CargoOverrides.bzl.
 """
 description = struct(
     package = struct(
         pkg_name = "rand",
         pkg_version = "0.3.15",
     ),
+    bazel_config = struct(
+        use_build_rs = True,
+        use_metadeps = False,
+    ),
     dependencies = [
         struct(
             name = "libc",
-            version = "0.2.20",
+            version = "0.2.24",
         ),
     ],
     build_dependencies = [],

@@ -24,14 +24,30 @@ platform_attrs:
     "unix"
 ]
 
-DO NOT MODIFY! Instead, add a CargoOverride.bzl mixin.
+DO NOT MODIFY! Instead, update vendor/CargoOverrides.bzl.
 """
 description = struct(
     package = struct(
         pkg_name = "specs",
         pkg_version = "0.7.1",
     ),
+    bazel_config = struct(
+        use_build_rs = True,
+        use_metadeps = False,
+    ),
     dependencies = [
+        struct(
+            name = "fnv",
+            version = "1.0.5",
+        ),
+        struct(
+            name = "atom",
+            version = "0.3.4",
+        ),
+        struct(
+            name = "tuple_utils",
+            version = "0.2.0",
+        ),
         struct(
             name = "pulse",
             version = "0.5.3",
@@ -41,28 +57,16 @@ description = struct(
             version = "1.3.2",
         ),
         struct(
-            name = "fnv",
-            version = "1.0.5",
-        ),
-        struct(
             name = "mopa",
             version = "0.2.2",
-        ),
-        struct(
-            name = "tuple_utils",
-            version = "0.2.0",
-        ),
-        struct(
-            name = "atom",
-            version = "0.3.4",
         ),
     ],
     build_dependencies = [],
     dev_dependencies = [],
     features = [
-        "default",
         "threadpool",
         "parallel",
+        "default",
         "pulse",
     ],
     targets = [

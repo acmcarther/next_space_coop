@@ -24,25 +24,29 @@ platform_attrs:
     "unix"
 ]
 
-DO NOT MODIFY! Instead, add a CargoOverride.bzl mixin.
+DO NOT MODIFY! Instead, update vendor/CargoOverrides.bzl.
 """
 description = struct(
     package = struct(
         pkg_name = "gaffer_udp",
         pkg_version = "0.1.4",
     ),
+    bazel_config = struct(
+        use_build_rs = True,
+        use_metadeps = False,
+    ),
     dependencies = [
         struct(
-            name = "mio",
-            version = "0.6.4",
-        ),
-        struct(
             name = "itertools",
-            version = "0.5.9",
+            version = "0.5.10",
         ),
         struct(
             name = "byteorder",
             version = "1.0.0",
+        ),
+        struct(
+            name = "mio",
+            version = "0.6.9",
         ),
     ],
     build_dependencies = [],

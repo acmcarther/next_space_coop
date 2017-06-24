@@ -24,33 +24,37 @@ platform_attrs:
     "unix"
 ]
 
-DO NOT MODIFY! Instead, add a CargoOverride.bzl mixin.
+DO NOT MODIFY! Instead, update vendor/CargoOverrides.bzl.
 """
 description = struct(
     package = struct(
         pkg_name = "ncollide_utils",
         pkg_version = "0.5.0",
     ),
+    bazel_config = struct(
+        use_build_rs = True,
+        use_metadeps = False,
+    ),
     dependencies = [
         struct(
-            name = "num",
-            version = "0.1.36",
+            name = "ncollide_math",
+            version = "0.5.0",
+        ),
+        struct(
+            name = "nalgebra",
+            version = "0.9.0",
         ),
         struct(
             name = "rand",
             version = "0.3.15",
         ),
         struct(
-            name = "ncollide_math",
-            version = "0.5.0",
+            name = "num",
+            version = "0.1.39",
         ),
         struct(
             name = "rustc-serialize",
-            version = "0.3.22",
-        ),
-        struct(
-            name = "nalgebra",
-            version = "0.9.0",
+            version = "0.3.24",
         ),
     ],
     build_dependencies = [],

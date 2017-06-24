@@ -24,19 +24,23 @@ platform_attrs:
     "unix"
 ]
 
-DO NOT MODIFY! Instead, add a CargoOverride.bzl mixin.
+DO NOT MODIFY! Instead, update vendor/CargoOverrides.bzl.
 """
 description = struct(
     package = struct(
         pkg_name = "byteorder",
         pkg_version = "1.0.0",
     ),
+    bazel_config = struct(
+        use_build_rs = True,
+        use_metadeps = False,
+    ),
     dependencies = [],
     build_dependencies = [],
     dev_dependencies = [],
     features = [
-        "default",
         "std",
+        "default",
     ],
     targets = [
         struct(
