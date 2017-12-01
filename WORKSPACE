@@ -1,7 +1,7 @@
 git_repository(
     name = "io_bazel_rules_rust",
-    commit = "674dcd9",
-    remote = "https://github.com/bazelbuild/rules_rust.git",
+    commit = "2be3d24",
+    remote = "https://github.com/acmcarther/rules_rust.git",
 )
 
 load("@io_bazel_rules_rust//rust:repositories.bzl", "rust_repositories")
