@@ -1,40 +1,29 @@
 git_repository(
-    name = "subpar",
-    remote = "https://github.com/google/subpar",
-    commit = "74529f1df2178f07d34c72b3d270355dab2a10fc",
-)
-
-git_repository(
-  name = "io_bazel_rules_raze",
-  remote = "https://github.com/acmcarther/cargo-raze",
-  commit = "3f73e33"
-)
-
-git_repository(
     name = "io_bazel_rules_rust",
-    remote = "https://github.com/acmcarther/rules_rust.git",
-    commit = "16f38b2"
+    commit = "674dcd9",
+    remote = "https://github.com/bazelbuild/rules_rust.git",
 )
+
 load("@io_bazel_rules_rust//rust:repositories.bzl", "rust_repositories")
 
 rust_repositories()
 
 git_repository(
-  name = "org_pubref_rules_protobuf",
-  remote = "https://github.com/acmcarther/rules_protobuf",
-  commit = "31040f9",
+    name = "org_pubref_rules_protobuf",
+    commit = "563b674",
+    remote = "https://github.com/pubref/rules_protobuf",
 )
 
 load("@org_pubref_rules_protobuf//protobuf:rules.bzl", "proto_repositories")
+
 proto_repositories()
 
 load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cpp_proto_repositories")
+
 cpp_proto_repositories()
 
 new_git_repository(
     name = "protoc_gen_rust",
-    remote = "https://github.com/acmcarther/rust-protobuf",
-    commit = "f3af1e3",
     build_file_content = """
 package(default_visibility = ["//visibility:public"])
 
@@ -55,5 +44,6 @@ rust_binary(
   crate_root = "src/protoc-gen-rust.rs",
   deps = [":protobuf"],
 )""",
+    commit = "f3af1e3",
+    remote = "https://github.com/acmcarther/rust-protobuf",
 )
-

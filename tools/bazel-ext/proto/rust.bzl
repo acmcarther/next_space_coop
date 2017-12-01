@@ -6,7 +6,6 @@ load(
     "rust_doc",
     "rust_doc_test",
 )
-
 load("@org_pubref_rules_protobuf//protobuf:rules.bzl", "proto_compile")
 
 def build_librs_cmd(deps):
@@ -42,7 +41,7 @@ def rust_proto_library(
   proto_compile(
     name = name + ".pb",
     # Pass in a list of proto_language rules
-    langs = ["//tools/bazel/proto:rust"],
+    langs = ["//tools/bazel-ext/proto:rust"],
     deps = [dep + ".pb" for dep in proto_deps],
     protos = protos
   )

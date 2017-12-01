@@ -27,3 +27,7 @@ default-features = false
 
 [lib]
 path = "fake_lib.rs"
+
+[raze]
+workspace_path = "//cargo"
+target = "x86_64-unknown-linux-gnu"

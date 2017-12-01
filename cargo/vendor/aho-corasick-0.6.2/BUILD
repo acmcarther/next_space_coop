@@ -1,12 +1,51 @@
-package(default_visibility = ["//cargo/vendor:__subpackages__"])
+"""
+cargo-raze crate build file.
 
-load("@io_bazel_rules_raze//raze:raze.bzl", "cargo_library")
-load(":Cargo.bzl", "description")
-load(":CargoOverride.bzl", "override")
+DO NOT EDIT! Replaced on runs of cargo-raze
+"""
+package(default_visibility = ["//cargo:__subpackages__"])
 
-cargo_library(
-    srcs = glob(["lib.rs", "src/**/*.rs"]),
-    cargo_bzl = description,
-    cargo_override_bzl = override,
-    workspace_path = "//cargo/vendor/"
+load(
+    "@io_bazel_rules_rust//rust:rust.bzl",
+    "rust_library",
+    "rust_binary",
+    "rust_test",
+    "rust_bench_test",
 )
+
+rust_binary(
+    name = "aho_corasick_dot",
+    crate_root = "src/main.rs",
+    srcs = glob(["**/*.rs"]),
+    deps = [
+        "//cargo/vendor/memchr-1.0.1:memchr",
+        
+    ],
+    rustc_flags = [
+        "--cap-lints allow",
+        "--target=x86_64-unknown-linux-gnu",
+        
+    ],
+    crate_features = [
+        
+    ],
+)
+rust_library(
+    name = "aho_corasick",
+    crate_root = "src/lib.rs",
+    srcs = glob(["**/*.rs"]),
+    deps = [
+        "//cargo/vendor/memchr-1.0.1:memchr",
+        
+    ],
+    rustc_flags = [
+        "--cap-lints allow",
+        "--target=x86_64-unknown-linux-gnu",
+        
+    ],
+    crate_features = [
+        
+    ],
+)
+# Unsupported target "bench" with type "bench" omitted
+# Unsupported target "dict-search" with type "example" omitted

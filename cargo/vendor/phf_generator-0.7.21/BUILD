@@ -1,12 +1,33 @@
-package(default_visibility = ["//cargo/vendor:__subpackages__"])
+"""
+cargo-raze crate build file.
 
-load("@io_bazel_rules_raze//raze:raze.bzl", "cargo_library")
-load(":Cargo.bzl", "description")
-load(":CargoOverride.bzl", "override")
+DO NOT EDIT! Replaced on runs of cargo-raze
+"""
+package(default_visibility = ["//cargo:__subpackages__"])
 
-cargo_library(
-    srcs = glob(["lib.rs", "src/**/*.rs"]),
-    cargo_bzl = description,
-    cargo_override_bzl = override,
-    workspace_path = "//cargo/vendor/"
+load(
+    "@io_bazel_rules_rust//rust:rust.bzl",
+    "rust_library",
+    "rust_binary",
+    "rust_test",
+    "rust_bench_test",
+)
+
+rust_library(
+    name = "phf_generator",
+    crate_root = "src/lib.rs",
+    srcs = glob(["**/*.rs"]),
+    deps = [
+        "//cargo/vendor/phf_shared-0.7.21:phf_shared",
+        "//cargo/vendor/rand-0.3.15:rand",
+        
+    ],
+    rustc_flags = [
+        "--cap-lints allow",
+        "--target=x86_64-unknown-linux-gnu",
+        
+    ],
+    crate_features = [
+        
+    ],
 )

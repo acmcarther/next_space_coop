@@ -1,12 +1,35 @@
-package(default_visibility = ["//cargo/vendor:__subpackages__"])
+"""
+cargo-raze crate build file.
 
-load("@io_bazel_rules_raze//raze:raze.bzl", "cargo_library")
-load(":Cargo.bzl", "description")
-load(":CargoOverride.bzl", "override")
+DO NOT EDIT! Replaced on runs of cargo-raze
+"""
+package(default_visibility = ["//cargo:__subpackages__"])
 
-cargo_library(
-    srcs = glob(["lib.rs", "src/**/*.rs"]),
-    cargo_bzl = description,
-    cargo_override_bzl = override,
-    workspace_path = "//cargo/vendor/"
+load(
+    "@io_bazel_rules_rust//rust:rust.bzl",
+    "rust_library",
+    "rust_binary",
+    "rust_test",
+    "rust_bench_test",
+)
+
+# Unsupported target "cucumber" with type "test" omitted
+rust_library(
+    name = "gaffer_udp",
+    crate_root = "src/lib.rs",
+    srcs = glob(["**/*.rs"]),
+    deps = [
+        "//cargo/vendor/byteorder-1.0.0:byteorder",
+        "//cargo/vendor/itertools-0.5.9:itertools",
+        "//cargo/vendor/mio-0.6.4:mio",
+        
+    ],
+    rustc_flags = [
+        "--cap-lints allow",
+        "--target=x86_64-unknown-linux-gnu",
+        
+    ],
+    crate_features = [
+        
+    ],
 )

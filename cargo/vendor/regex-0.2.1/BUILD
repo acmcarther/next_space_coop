@@ -1,12 +1,50 @@
-package(default_visibility = ["//cargo/vendor:__subpackages__"])
+"""
+cargo-raze crate build file.
 
-load("@io_bazel_rules_raze//raze:raze.bzl", "cargo_library")
-load(":Cargo.bzl", "description")
-load(":CargoOverride.bzl", "override")
+DO NOT EDIT! Replaced on runs of cargo-raze
+"""
+package(default_visibility = ["//cargo:__subpackages__"])
 
-cargo_library(
-    srcs = glob(["lib.rs", "src/**/*.rs"]),
-    cargo_bzl = description,
-    cargo_override_bzl = override,
-    workspace_path = "//cargo/vendor/"
+load(
+    "@io_bazel_rules_rust//rust:rust.bzl",
+    "rust_library",
+    "rust_binary",
+    "rust_test",
+    "rust_bench_test",
 )
+
+# Unsupported target "backtrack" with type "test" omitted
+# Unsupported target "backtrack-bytes" with type "test" omitted
+# Unsupported target "backtrack-utf8bytes" with type "test" omitted
+# Unsupported target "default" with type "test" omitted
+# Unsupported target "default-bytes" with type "test" omitted
+# Unsupported target "nfa" with type "test" omitted
+# Unsupported target "nfa-bytes" with type "test" omitted
+# Unsupported target "nfa-utf8bytes" with type "test" omitted
+rust_library(
+    name = "regex",
+    crate_root = "src/lib.rs",
+    srcs = glob(["**/*.rs"]),
+    deps = [
+        "//cargo/vendor/aho-corasick-0.6.2:aho_corasick",
+        "//cargo/vendor/memchr-1.0.1:memchr",
+        "//cargo/vendor/regex-syntax-0.4.0:regex_syntax",
+        "//cargo/vendor/thread_local-0.3.2:thread_local",
+        "//cargo/vendor/utf8-ranges-1.0.0:utf8_ranges",
+        
+    ],
+    rustc_flags = [
+        "--cap-lints allow",
+        "--target=x86_64-unknown-linux-gnu",
+        
+    ],
+    crate_features = [
+        
+    ],
+)
+# Unsupported target "shootout-regex-dna" with type "example" omitted
+# Unsupported target "shootout-regex-dna-bytes" with type "example" omitted
+# Unsupported target "shootout-regex-dna-cheat" with type "example" omitted
+# Unsupported target "shootout-regex-dna-replace" with type "example" omitted
+# Unsupported target "shootout-regex-dna-single" with type "example" omitted
+# Unsupported target "shootout-regex-dna-single-cheat" with type "example" omitted
